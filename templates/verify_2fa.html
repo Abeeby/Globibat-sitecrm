@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Vérification 2FA - Globibat{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-4">
+                        <i class="fas fa-shield-alt text-primary"></i> Vérification 2FA
+                    </h2>
+                    
+                    <p class="text-center text-muted mb-4">
+                        Entrez le code à 6 chiffres de votre application d'authentification
+                    </p>
+                    
+                    <form method="POST">
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-key"></i>
+                                </span>
+                                <input type="text" 
+                                       class="form-control form-control-lg text-center" 
+                                       name="code" 
+                                       pattern="[0-9]{6}" 
+                                       maxlength="6"
+                                       placeholder="000000"
+                                       required 
+                                       autofocus
+                                       autocomplete="one-time-code">
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-check"></i> Vérifier
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-center">
+                        <a href="{{ url_for('login') }}" class="btn btn-link">
+                            <i class="fas fa-arrow-left"></i> Retour à la connexion
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Focus automatique sur le champ
+document.querySelector('input[name="code"]').focus();
+
+// Soumission automatique quand 6 chiffres sont entrés
+document.querySelector('input[name="code"]').addEventListener('input', function(e) {
+    if (e.target.value.length === 6) {
+        e.target.form.submit();
+    }
+});
+</script>
+{% endblock %} 

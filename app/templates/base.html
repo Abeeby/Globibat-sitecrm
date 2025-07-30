@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <!-- SEO Meta Tags -->
+    <title>{% block title %}{% endblock %}{{ config.SEO_TITLE_SUFFIX }}</title>
+    <meta name="description" content="{% block meta_description %}{{ config.SEO_DESCRIPTION }}{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}{{ config.SEO_KEYWORDS }}{% endblock %}">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Globibat SA">
+    <link rel="canonical" href="{{ request.url }}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ self.meta_description() }}{% endblock %}">
+    <meta property="og:image" content="{{ url_for('static', filename='img/og-image.jpg', _external=True) }}">
+    <meta property="og:locale" content="fr_CH">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ request.url }}">
+    <meta property="twitter:title" content="{{ self.og_title() }}">
+    <meta property="twitter:description" content="{{ self.og_description() }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+    
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    
+    {% block extra_css %}{% endblock %}
+    
+    <!-- Schema.org for Google -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Globibat SA",
+        "url": "{{ config.COMPANY_WEBSITE }}",
+        "logo": "{{ url_for('static', filename='img/logo.png', _external=True) }}",
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "{{ config.COMPANY_PHONE }}",
+            "contactType": "customer service",
+            "areaServed": "CH",
+            "availableLanguage": ["French", "German", "Italian"]
+        },
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "{{ config.COMPANY_ADDRESS }}",
+            "addressLocality": "{{ config.COMPANY_CITY }}",
+            "addressRegion": "{{ config.COMPANY_CANTON }}",
+            "postalCode": "{{ config.COMPANY_POSTAL_CODE }}",
+            "addressCountry": "CH"
+        }
+    }
+    </script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='img/logo-white.png') }}" alt="Globibat" height="40">
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                {% if current_user.is_authenticated %}
+                <!-- Menu connecté -->
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'main.dashboard' %}active{% endif %}" href="{{ url_for('main.dashboard') }}">
+                            <i class="bi bi-speedometer2"></i> Tableau de bord
+                        </a>
+                    </li>
+                    
+                    <!-- CRM -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <i class="bi bi-briefcase"></i> CRM
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('crm.clients_list') }}">
+                                <i class="bi bi-people"></i> Clients
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('crm.projects_list') }}">
+                                <i class="bi bi-building"></i> Projets
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('crm.quotes_list') }}">
+                                <i class="bi bi-file-earmark-text"></i> Devis
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('crm.invoices_list') }}">
+                                <i class="bi bi-receipt"></i> Factures
+                            </a></li>
+                        </ul>
+                    </li>
+                    
+                    <!-- RH -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-badge"></i> RH
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('admin.employees_list') }}">
+                                <i class="bi bi-person-lines-fill"></i> Employés
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.leaves_list') }}">
+                                <i class="bi bi-calendar-x"></i> Congés
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.payroll_list') }}">
+                                <i class="bi bi-cash-stack"></i> Paie
+                            </a></li>
+                        </ul>
+                    </li>
+                    
+                    {% if current_user.has_permission('admin') %}
+                    <!-- Admin -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint.startswith('admin.') %}active{% endif %}" href="{{ url_for('admin.dashboard') }}">
+                            <i class="bi bi-gear"></i> Admin
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+                
+                <!-- Menu utilisateur -->
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> {{ current_user.full_name }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{{ url_for('auth.profile') }}">
+                                <i class="bi bi-person"></i> Mon profil
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                                <i class="bi bi-box-arrow-right"></i> Déconnexion
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+                
+                {% else %}
+                <!-- Menu public -->
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.services') }}">Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.about') }}">À propos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.contact') }}">Contact</a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.login') }}">
+                            <i class="bi bi-box-arrow-in-right"></i> Connexion
+                        </a>
+                    </li>
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Messages Flash -->
+    <div class="container-fluid mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    
+    <!-- Contenu principal -->
+    <main class="{% block main_class %}container-fluid{% endblock %} py-4">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-dark text-white mt-5 py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>Globibat SA</h5>
+                    <p class="mb-0">{{ config.COMPANY_ADDRESS }}</p>
+                    <p>{{ config.COMPANY_POSTAL_CODE }} {{ config.COMPANY_CITY }}</p>
+                    <p><i class="bi bi-telephone"></i> {{ config.COMPANY_PHONE }}</p>
+                    <p><i class="bi bi-envelope"></i> {{ config.COMPANY_EMAIL }}</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Services</h5>
+                    <ul class="list-unstyled">
+                        <li>Construction neuve</li>
+                        <li>Rénovation</li>
+                        <li>Transformation</li>
+                        <li>Maçonnerie</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Zones d'intervention</h5>
+                    <ul class="list-unstyled">
+                        <li>Genève</li>
+                        <li>Lausanne</li>
+                        <li>Fribourg</li>
+                        <li>Suisse romande</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="text-center">
+                <p class="mb-0">&copy; {{ current_year }} {{ company_name }} - Tous droits réservés</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    
+    {% block extra_js %}{% endblock %}
+    
+    <!-- Initialisation -->
+    <script>
+        $(document).ready(function() {
+            // Select2
+            $('.select2').select2({
+                theme: 'bootstrap-5'
+            });
+            
+            // Tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        });
+    </script>
+</body>
+</html>

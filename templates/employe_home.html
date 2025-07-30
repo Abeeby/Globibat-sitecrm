@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Portail Employé - {{ config.COMPANY_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="text-center mb-5">
+        <h1 class="display-4">
+            <i class="fas fa-users text-primary"></i> Portail Employé
+        </h1>
+        <p class="lead">Bienvenue sur votre espace personnel {{ config.COMPANY_NAME }}</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-body p-5">
+                    <h3 class="text-center mb-4">
+                        <i class="fas fa-sign-in-alt text-primary"></i> Accès à votre espace
+                    </h3>
+                    
+                    <div class="d-grid gap-3">
+                        <a href="{{ url_for('employe_login') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-user-check"></i> Me connecter
+                        </a>
+                        
+                        <a href="{{ url_for('badge') }}" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-clock"></i> Badger directement
+                        </a>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-center">
+                        <h5 class="mb-3">Dans votre espace, vous pourrez :</h5>
+                        <ul class="list-unstyled text-start">
+                            <li><i class="fas fa-check text-success"></i> Consulter vos pointages</li>
+                            <li><i class="fas fa-check text-success"></i> Voir vos heures travaillées</li>
+                            <li><i class="fas fa-check text-success"></i> Suivre vos retards et absences</li>
+                            <li><i class="fas fa-check text-success"></i> Télécharger vos relevés mensuels</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

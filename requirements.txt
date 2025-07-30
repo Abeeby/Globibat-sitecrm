@@ -1,0 +1,87 @@
+# Core Flask
+Flask==3.0.0
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.3
+Flask-Mail==0.9.1
+Flask-Migrate==4.0.5
+Flask-WTF==1.2.1
+Flask-Cors==4.0.0
+
+# Database
+PyMySQL==1.1.0  # Pour MySQL/MariaDB (Hostinger)
+psycopg2-binary==2.9.9  # Pour PostgreSQL (alternative)
+
+# Authentication & Security
+pyotp==2.9.0
+qrcode==7.4.2
+python-jose==3.3.0  # JWT tokens
+argon2-cffi==23.1.0  # Meilleur que bcrypt
+
+# Data processing
+pandas==2.2.3
+openpyxl==3.1.2
+python-dateutil==2.8.2
+pytz==2023.3
+
+# PDF Generation
+reportlab==4.0.8
+Pillow==10.1.0
+svglib==1.5.1
+PyPDF2==3.0.1
+
+# Charts & Visualization
+plotly==5.18.0
+matplotlib==3.8.2
+seaborn==0.13.0
+
+# Real-time features
+flask-socketio==5.3.6
+python-socketio==5.10.0
+eventlet==0.33.3  # Pour websockets
+
+# API & Serialization
+marshmallow==3.20.1
+marshmallow-sqlalchemy==0.29.0
+flask-restful==0.3.10
+
+# Cache & Performance
+Flask-Caching==2.1.0
+redis==5.0.1
+celery==5.3.4  # Pour tâches asynchrones
+
+# Forms & Validation
+WTForms==3.1.1
+email-validator==2.1.0.post1
+
+# File handling
+python-magic==0.4.27
+werkzeug==3.0.1
+
+# Development & Testing
+python-dotenv==1.0.0
+pytest==7.4.3
+pytest-flask==1.3.0
+faker==20.1.0  # Génération de données test
+
+# Production server
+gunicorn==21.2.0
+gevent==23.9.1  # Worker async pour gunicorn
+
+# Monitoring & Logging
+sentry-sdk[flask]==1.39.1
+python-json-logger==2.0.7
+
+# Scheduling
+APScheduler==3.10.4  # Pour tâches planifiées
+
+# Swiss specific
+schwifty==2023.11.0  # Validation IBAN
+
+# SEO & Web
+beautifulsoup4==4.12.2
+lxml==5.0.0
+
+# Utilities
+click==8.1.7
+python-slugify==8.0.1
+humanize==4.9.0 

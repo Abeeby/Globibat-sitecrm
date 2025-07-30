@@ -1,0 +1,151 @@
+/* Style personnalisé pour le système de badgeage Globibat */
+
+/* Corps et général */
+body {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Navigation personnalisée */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+/* Cartes améliorées */
+.card {
+    border: none;
+    border-radius: 10px;
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.card.shadow-lg {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Boutons de badgeage */
+.btn-check:checked + .btn-outline-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-check:checked + .btn-outline-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.btn-check:checked + .btn-outline-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.btn-check:checked + .btn-outline-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+/* Tableaux améliorés */
+.table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f1f3f5;
+}
+
+/* Badges personnalisés */
+.badge {
+    padding: 0.375rem 0.75rem;
+    font-weight: 500;
+}
+
+/* Formulaires */
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-control-lg {
+    font-size: 1.25rem;
+    padding: 0.75rem 1rem;
+}
+
+/* Heure en temps réel */
+.current-time {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+}
+
+/* Alertes améliorées */
+.alert {
+    border: none;
+    border-radius: 8px;
+}
+
+/* Statistiques du tableau de bord */
+.display-4 {
+    font-weight: 300;
+    line-height: 1;
+}
+
+/* Jumbotron personnalisé */
+.jumbotron {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+/* Animation de chargement */
+.fa-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .btn-group {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn-group .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .table {
+        font-size: 0.875rem;
+    }
+}
+
+/* Impression */
+@media print {
+    .navbar, footer, .btn, .alert {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #dee2e6 !important;
+        box-shadow: none !important;
+    }
+} 

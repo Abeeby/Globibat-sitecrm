@@ -1,0 +1,25 @@
+# Robots.txt pour Globibat
+# Optimisé pour le SEO
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /login
+Disallow: /logout
+Disallow: /static/uploads/
+Disallow: /instance/
+
+# Sitemaps
+Sitemap: https://www.globibat.com/sitemap.xml
+Sitemap: https://globibat.ch/sitemap.xml
+
+# Crawl-delay pour éviter surcharge
+Crawl-delay: 1
+
+# Googlebot spécifique
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Crawl-delay: 0

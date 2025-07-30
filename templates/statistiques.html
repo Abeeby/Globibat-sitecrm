@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Statistiques avancées - Globibat{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-card {
+        transition: transform 0.2s;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    .chart-container {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>
+                <i class="fas fa-chart-line text-primary"></i> Statistiques avancées
+            </h1>
+            <p class="text-muted">Tableau de bord analytique</p>
+        </div>
+    </div>
+
+    <!-- Cartes de statistiques rapides -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card bg-primary text-white">
+                <div class="card-body">
+                    <h5><i class="fas fa-users"></i> Employés actifs</h5>
+                    <h2>{{ employes_actifs }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card bg-success text-white">
+                <div class="card-body">
+                    <h5><i class="fas fa-clock"></i> Heures ce mois</h5>
+                    <h2 id="heures-mois">-</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card bg-warning text-white">
+                <div class="card-body">
+                    <h5><i class="fas fa-exclamation-triangle"></i> Retards ce mois</h5>
+                    <h2 id="retards-mois">-</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card bg-info text-white">
+                <div class="card-body">
+                    <h5><i class="fas fa-percentage"></i> Taux présence</h5>
+                    <h2 id="taux-presence">-</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques principaux -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="chart-container">
+                <div id="presence-chart"></div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="chart-container">
+                <div id="punctuality-gauge"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="chart-container">
+                <div id="hours-distribution"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top employés ponctuels -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5><i class="fas fa-trophy"></i> Top 5 - Employés les plus ponctuels ce mois</h5>
+                </div>
+                <div class="card-body">
+                    <ol class="list-group list-group-numbered">
+                        {% for employe, jours in top_ponctuels %}
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">{{ employe.nom }} {{ employe.prenom }}</div>
+                                {{ employe.departement or 'Sans département' }}
+                            </div>
+                            <span class="badge bg-success rounded-pill">{{ jours }} jours parfaits</span>
+                        </li>
+                        {% endfor %}
+                    </ol>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5><i class="fas fa-download"></i> Actions rapides</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary" onclick="exporterGraphiques()">
+                            <i class="fas fa-file-pdf"></i> Exporter en PDF
+                        </button>
+                        <button class="btn btn-outline-success" onclick="genererRapportDetaille()">
+                            <i class="fas fa-file-excel"></i> Rapport Excel détaillé
+                        </button>
+                        <button class="btn btn-outline-info" onclick="actualiserDonnees()">
+                            <i class="fas fa-sync"></i> Actualiser les données
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Plotly -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<script>
+// Charger les graphiques
+document.addEventListener('DOMContentLoaded', function() {
+    // Graphiques depuis le backend - NOTE: les graphiques sont déjà en JSON
+    {% if charts.presence %}
+    const presenceData = JSON.parse('{{ charts.presence|safe }}');
+    Plotly.newPlot('presence-chart', presenceData.data, presenceData.layout);
+    {% endif %}
+    
+    {% if charts.punctuality %}
+    const punctualityData = JSON.parse('{{ charts.punctuality|safe }}');
+    Plotly.newPlot('punctuality-gauge', punctualityData.data, punctualityData.layout);
+    {% endif %}
+    
+    {% if charts.hours_distribution %}
+    const hoursData = JSON.parse('{{ charts.hours_distribution|safe }}');
+    Plotly.newPlot('hours-distribution', hoursData.data, hoursData.layout);
+    {% endif %}
+    
+    // Charger les stats via API
+    fetch('/api/stats/dashboard')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('heures-mois').textContent = data.mois.heures_totales + 'h';
+            document.getElementById('retards-mois').textContent = data.mois.retards;
+            
+            // Calculer le taux de présence (exemple)
+            const tauxPresence = 95; // À calculer selon vos besoins
+            document.getElementById('taux-presence').textContent = tauxPresence + '%';
+        });
+});
+
+// Fonctions d'export
+function exporterGraphiques() {
+    // Utiliser Plotly pour exporter en image
+    const graphIds = ['presence-chart', 'punctuality-gauge', 'hours-distribution'];
+    
+    graphIds.forEach(id => {
+        Plotly.downloadImage(id, {
+            format: 'png',
+            width: 1200,
+            height: 800,
+            filename: `globibat-${id}-${new Date().toISOString().split('T')[0]}`
+        });
+    });
+}
+
+function genererRapportDetaille() {
+    // Rediriger vers la génération de rapport mensuel
+    const mois = new Date().getMonth() + 1;
+    const annee = new Date().getFullYear();
+    window.location.href = `/admin/rapport/mensuel?mois=${mois}&annee=${annee}`;
+}
+
+function actualiserDonnees() {
+    location.reload();
+}
+
+// Redimensionner les graphiques quand la fenêtre change
+window.addEventListener('resize', function() {
+    Plotly.Plots.resize('presence-chart');
+    Plotly.Plots.resize('punctuality-gauge');
+    Plotly.Plots.resize('hours-distribution');
+});
+</script>
+{% endblock %} 

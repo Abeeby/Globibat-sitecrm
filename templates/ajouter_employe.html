@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Ajouter un employé - Système de Badgeage{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h3><i class="fas fa-user-plus"></i> Ajouter un nouvel employé</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('ajouter_employe') }}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="matricule" class="form-label">
+                                    <i class="fas fa-id-card"></i> Matricule *
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="matricule" 
+                                       name="matricule" 
+                                       placeholder="Ex: EMP001"
+                                       required>
+                                <small class="text-muted">Identifiant unique de l'employé</small>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="departement" class="form-label">
+                                    <i class="fas fa-building"></i> Département
+                                </label>
+                                <select class="form-control" id="departement" name="departement">
+                                    <option value="">-- Sélectionner --</option>
+                                    <option value="Production">Production</option>
+                                    <option value="Administration">Administration</option>
+                                    <option value="Commercial">Commercial</option>
+                                    <option value="Logistique">Logistique</option>
+                                    <option value="Maintenance">Maintenance</option>
+                                    <option value="Qualité">Qualité</option>
+                                    <option value="RH">Ressources Humaines</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="nom" class="form-label">
+                                    <i class="fas fa-user"></i> Nom *
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="nom" 
+                                       name="nom" 
+                                       placeholder="Nom de famille"
+                                       required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="prenom" class="form-label">
+                                    <i class="fas fa-user"></i> Prénom *
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="prenom" 
+                                       name="prenom" 
+                                       placeholder="Prénom"
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">
+                                    <i class="fas fa-envelope"></i> Email
+                                </label>
+                                <input type="email" 
+                                       class="form-control" 
+                                       id="email" 
+                                       name="email" 
+                                       placeholder="email@exemple.com">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="telephone" class="form-label">
+                                    <i class="fas fa-phone"></i> Téléphone
+                                </label>
+                                <input type="tel" 
+                                       class="form-control" 
+                                       id="telephone" 
+                                       name="telephone" 
+                                       placeholder="06 12 34 56 78">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('liste_employes') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Retour
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Enregistrer l'employé
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="alert alert-info mt-3">
+            <i class="fas fa-info-circle"></i> 
+            <strong>Note :</strong> Les champs marqués d'un astérisque (*) sont obligatoires.
+            Le matricule doit être unique pour chaque employé.
+        </div>
+    </div>
+</div>
+
+<script>
+// Validation du formulaire
+document.querySelector('form').addEventListener('submit', function(e) {
+    const matricule = document.getElementById('matricule').value;
+    const nom = document.getElementById('nom').value;
+    const prenom = document.getElementById('prenom').value;
+    
+    // Validation du matricule (alphanumeric seulement)
+    if (!/^[A-Za-z0-9]+$/.test(matricule)) {
+        e.preventDefault();
+        alert('Le matricule doit contenir uniquement des lettres et des chiffres.');
+        return;
+    }
+    
+    // Validation nom et prénom (lettres et tirets seulement)
+    if (!/^[A-Za-zÀ-ÿ\s\-]+$/.test(nom) || !/^[A-Za-zÀ-ÿ\s\-]+$/.test(prenom)) {
+        e.preventDefault();
+        alert('Le nom et le prénom doivent contenir uniquement des lettres.');
+        return;
+    }
+});
+
+// Format téléphone automatique
+document.getElementById('telephone').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\s/g, '');
+    let formattedValue = '';
+    
+    for (let i = 0; i < value.length && i < 10; i++) {
+        if (i > 0 && i % 2 === 0) {
+            formattedValue += ' ';
+        }
+        formattedValue += value[i];
+    }
+    
+    e.target.value = formattedValue;
+});
+</script>
+{% endblock %} 

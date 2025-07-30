@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# Flask
+instance/
+.webassets-cache
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.*
+.env.local
+.env.production
+env_configuration.txt
+
+# Logs
+*.log
+logs/
+
+# Static files
+static/rapport_*.xlsx
+static/exports/
+app/static/uploads/
+
+# Backup
+backup/
+backups/
+*.bak
+*.sql
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Documentation temporaire
+*.tmp
+*.temp
+
+# Secrets
+*.key
+*.pem
+secret_*
+
+# Fichiers spécifiques Hostinger
+index.py
+.htaccess
+maintenance.sh 

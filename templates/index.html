@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Accueil - Système de Badgeage{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="jumbotron text-center bg-light p-5 rounded">
+            <h1 class="display-4">
+                <i class="fas fa-id-badge"></i> Système de Badgeage Globibat
+            </h1>
+            <p class="lead">Bienvenue sur le système de pointage des employés</p>
+            <hr class="my-4">
+            <p class="fs-3 text-primary">
+                <i class="fas fa-clock"></i> 
+                <span class="current-time"></span>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card text-center shadow h-100">
+            <div class="card-body">
+                <i class="fas fa-user-clock fa-4x text-primary mb-3"></i>
+                <h3 class="card-title">Badgeage Rapide</h3>
+                <p class="card-text">Pointez rapidement votre présence</p>
+                <a href="{{ url_for('badge') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-fingerprint"></i> Badger
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-center shadow h-100">
+            <div class="card-body">
+                <i class="fas fa-users fa-4x text-info mb-3"></i>
+                <h3 class="card-title">Espace Employé</h3>
+                <p class="card-text">Consultez vos pointages et statistiques personnelles</p>
+                <a href="{{ url_for('portail_employe') }}" class="btn btn-info btn-lg">
+                    <i class="fas fa-user-circle"></i> Mon Espace
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    {% if current_user.is_authenticated %}
+    <div class="col-md-4">
+        <div class="card text-center shadow h-100">
+            <div class="card-body">
+                <i class="fas fa-user-shield fa-4x text-success mb-3"></i>
+                <h3 class="card-title">Administration</h3>
+                <p class="card-text">Gérez les employés et consultez les rapports</p>
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-success btn-lg">
+                    <i class="fas fa-tachometer-alt"></i> Tableau de bord
+                </a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-md-4">
+        <div class="card text-center shadow h-100">
+            <div class="card-body">
+                <i class="fas fa-user-shield fa-4x text-secondary mb-3"></i>
+                <h3 class="card-title">Administration</h3>
+                <p class="card-text">Réservé aux administrateurs</p>
+                <a href="{{ url_for('login') }}" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-lock"></i> Accès privé
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-info-circle"></i> Instructions de badgeage</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <i class="fas fa-sun fa-3x text-warning mb-2"></i>
+                        <h6>Arrivée Matin</h6>
+                        <p class="text-muted">Avant 9h00</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <i class="fas fa-utensils fa-3x text-info mb-2"></i>
+                        <h6>Départ Midi</h6>
+                        <p class="text-muted">Pause déjeuner</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <i class="fas fa-clock fa-3x text-primary mb-2"></i>
+                        <h6>Retour Après-midi</h6>
+                        <p class="text-muted">Avant 14h00</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <i class="fas fa-moon fa-3x text-dark mb-2"></i>
+                        <h6>Départ Soir</h6>
+                        <p class="text-muted">Fin de journée</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

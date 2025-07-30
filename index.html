@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="fr-CH">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- SEO Meta Tags Optimisées Construction Nyon -->
+    <title>Globibat Nyon - Entreprise Construction 5⭐ | Bâtiment Vaud | Rénovation Premium</title>
+    <meta name="description" content="Globibat Nyon, entreprise construction 5 étoiles (25 avis Google). Spécialiste rénovation, maçonnerie, transformation à Nyon. Devis gratuit instantané. ☎ 021 505 00 62">
+    <meta name="keywords" content="entreprise construction nyon, globibat, bâtiment nyon, rénovation nyon, maçonnerie nyon, construction vaud, transformation nyon, gros œuvre nyon, entreprise 5 étoiles nyon">
+    
+    <!-- Geo Tags SEO Local Nyon -->
+    <meta name="geo.region" content="CH-VD">
+    <meta name="geo.placename" content="Nyon">
+    <meta name="geo.position" content="46.3833;6.2348">
+    <meta name="ICBM" content="46.3833, 6.2348">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Globibat Nyon - Construction & Rénovation 5⭐">
+    <meta property="og:description" content="Entreprise construction Nyon notée 5/5. Devis gratuit instantané. ☎ 021 505 00 62">
+    <meta property="og:type" content="business.business">
+    <meta property="og:url" content="https://www.globibat.com">
+    <meta property="og:locale" content="fr_CH">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="https://www.globibat.com">
+    
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #004a99;
+            --secondary: #ff6b35;
+            --accent: #ffd700;
+            --dark: #1a1a1a;
+            --light: #f8f9fa;
+            --gradient: linear-gradient(135deg, #004a99 0%, #0066cc 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+        
+        /* Header Hero Section */
+        .hero {
+            background: var(--gradient);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: float 20s linear infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(-50px, -50px) rotate(360deg); }
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            margin-bottom: 20px;
+            animation: fadeInUp 1s ease;
+        }
+        
+        .rating {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            animation: fadeInUp 1s ease 0.2s;
+            animation-fill-mode: backwards;
+        }
+        
+        .rating .stars {
+            color: var(--accent);
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+            animation: fadeInUp 1s ease 0.4s;
+            animation-fill-mode: backwards;
+        }
+        
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 107, 53, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-secondary:hover {
+            background: white;
+            color: var(--primary);
+        }
+        
+        /* Calculateur de devis */
+        .calculator {
+            background: white;
+            padding: 60px 20px;
+            position: relative;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 50px;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--secondary);
+        }
+        
+        .calc-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--light);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .calc-form {
+            display: grid;
+            gap: 25px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+        
+        .calc-result {
+            margin-top: 30px;
+            padding: 30px;
+            background: var(--gradient);
+            color: white;
+            border-radius: 15px;
+            text-align: center;
+            transform: scale(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .calc-result.show {
+            transform: scale(1);
+        }
+        
+        .price {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        /* Services avec animations */
+        .services {
+            padding: 80px 20px;
+            background: var(--light);
+        }
+        
+        .services-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        
+        .service-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+            transform-origin: left;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .service-icon {
+            font-size: 3rem;
+            color: var(--secondary);
+            margin-bottom: 20px;
+        }
+        
+        .service-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        /* Avis clients animés */
+        .testimonials {
+            padding: 80px 20px;
+            background: white;
+            overflow: hidden;
+        }
+        
+        .testimonials-slider {
+            display: flex;
+            animation: slide 20s linear infinite;
+        }
+        
+        @keyframes slide {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        
+        .testimonial {
+            min-width: 400px;
+            padding: 30px;
+            margin: 0 15px;
+            background: var(--light);
+            border-radius: 20px;
+            position: relative;
+        }
+        
+        .testimonial::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            left: 30px;
+            font-size: 100px;
+            color: var(--secondary);
+            opacity: 0.3;
+        }
+        
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+        
+        .testimonial-author {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .testimonial-stars {
+            color: var(--accent);
+            margin-top: 10px;
+        }
+        
+        /* Contact et Map */
+        .contact {
+            padding: 80px 20px;
+            background: var(--gradient);
+            color: white;
+        }
+        
+        .contact-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+        
+        .contact-info h2 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        
+        .contact-item i {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            width: 30px;
+        }
+        
+        .map-container {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            height: 400px;
+            position: relative;
+        }
+        
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        /* Chat Widget */
+        .chat-widget {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+        
+        .chat-button {
+            width: 60px;
+            height: 60px;
+            background: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(255, 107, 53, 0.4);
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .chat-button:hover {
+            transform: scale(1.2);
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+        
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .testimonial {
+                min-width: 300px;
+            }
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .social-links {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .social-links a {
+            color: white;
+            font-size: 1.5rem;
+            transition: color 0.3s;
+        }
+        
+        .social-links a:hover {
+            color: var(--secondary);
+        }
+        
+        /* Bouton scroll to top */
+        .scroll-top {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 999;
+        }
+        
+        .scroll-top.visible {
+            opacity: 1;
+        }
+        
+        .scroll-top:hover {
+            background: var(--secondary);
+            transform: translateY(-5px);
+        }
+        
+        /* Galerie de Projets */
+        .projects {
+            padding: 80px 20px;
+            background: white;
+        }
+        
+        .project-filters {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 10px 25px;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .projects-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        
+        .project-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .project-image {
+            position: relative;
+            height: 300px;
+            overflow: hidden;
+        }
+        
+        .project-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        
+        .project-card:hover img {
+            transform: scale(1.1);
+        }
+        
+        .project-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+            color: white;
+            padding: 30px 20px;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+        
+        .project-card:hover .project-overlay {
+            transform: translateY(0);
+        }
+        
+        .project-overlay h4 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+        
+        .project-price {
+            font-size: 1.2rem;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+        
+        /* Statistiques */
+        .stats {
+            background: var(--gradient);
+            padding: 80px 20px;
+            color: white;
+        }
+        
+        .stats-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            text-align: center;
+        }
+        
+        .stat {
+            position: relative;
+        }
+        
+        .stat i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+        
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .stat p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        /* Système de RDV */
+        .appointment {
+            padding: 80px 20px;
+            background: var(--light);
+        }
+        
+        .appointment-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+        
+        .appointment-info h3 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .appointment-info ul {
+            list-style: none;
+            margin-top: 30px;
+        }
+        
+        .appointment-info li {
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .appointment-info i {
+            color: var(--secondary);
+        }
+        
+        .appointment-form {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .appointment-form input,
+        .appointment-form select,
+        .appointment-form textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .appointment-form input:focus,
+        .appointment-form select:focus,
+        .appointment-form textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+        
+        /* FAQ */
+        .faq {
+            padding: 80px 20px;
+            background: white;
+        }
+        
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .faq-item {
+            background: var(--light);
+            margin-bottom: 20px;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .faq-item:hover {
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .faq-question {
+            padding: 25px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+        
+        .faq-question:hover {
+            background: rgba(0, 74, 153, 0.05);
+        }
+        
+        .faq-question h3 {
+            margin: 0;
+            color: var(--primary);
+        }
+        
+        .faq-question i {
+            transition: transform 0.3s;
+            color: var(--secondary);
+        }
+        
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+        
+        .faq-answer {
+            padding: 0 25px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .faq-item.active .faq-answer {
+            padding: 0 25px 25px;
+            max-height: 500px;
+        }
+        
+        /* Newsletter & Blog */
+        .newsletter-blog {
+            padding: 80px 20px;
+            background: var(--gradient);
+            color: white;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .newsletter h3,
+        .latest-posts h3 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        
+        .newsletter-form {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .newsletter-form input {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+        }
+        
+        .blog-posts {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .blog-post {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+        
+        .blog-post:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(10px);
+        }
+        
+        .post-date {
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+        
+        .blog-post h4 {
+            margin: 10px 0;
+        }
+        
+        .read-more {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        
+        .read-more:hover {
+            color: white;
+        }
+        
+        /* Mode Sombre Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            z-index: 1001;
+        }
+        
+        .theme-toggle:hover {
+            background: var(--secondary);
+            transform: scale(1.1);
+        }
+        
+        /* Mode Sombre */
+        body.dark-mode {
+            background: #1a1a1a;
+            color: #f0f0f0;
+        }
+        
+        body.dark-mode .hero {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+        }
+        
+        body.dark-mode .services,
+        body.dark-mode .calculator,
+        body.dark-mode .faq,
+        body.dark-mode .projects {
+            background: #1a1a1a;
+        }
+        
+        body.dark-mode .service-card,
+        body.dark-mode .calc-container,
+        body.dark-mode .appointment-form,
+        body.dark-mode .faq-item {
+            background: #2a2a2a;
+            color: #f0f0f0;
+        }
+        
+        body.dark-mode .section-title {
+            color: #f0f0f0;
+        }
+        
+        body.dark-mode .theme-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--secondary);
+        }
+        
+        body.dark-mode .theme-toggle i::before {
+            content: "\f185";
+        }
+        
+        /* Responsive amélioré */
+        @media (max-width: 768px) {
+            .appointment-container,
+            .newsletter-blog {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Globibat - Construction & Rénovation Premium</h1>
+            <div class="rating">
+                <span class="stars">★★★★★</span> 5.0/5 (25 avis Google)
+            </div>
+            <p style="font-size: 1.3rem; margin-bottom: 30px;">
+                Votre expert construction à Nyon depuis plus de 20 ans
+            </p>
+            <div class="hero-buttons">
+                <a href="tel:0215050062" class="btn btn-primary">
+                    <i class="fas fa-phone"></i> 021 505 00 62
+                </a>
+                <a href="#calculateur" class="btn btn-secondary">
+                    <i class="fas fa-calculator"></i> Devis instantané
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Calculateur de devis -->
+    <section id="calculateur" class="calculator">
+        <h2 class="section-title animate-on-scroll">Calculez votre devis en 30 secondes</h2>
+        <div class="calc-container animate-on-scroll">
+            <form class="calc-form" id="devisForm">
+                <div class="form-group">
+                    <label for="project-type">Type de projet</label>
+                    <select id="project-type" required>
+                        <option value="">Sélectionnez...</option>
+                        <option value="renovation">Rénovation complète</option>
+                        <option value="construction">Construction neuve</option>
+                        <option value="extension">Extension/Surélévation</option>
+                        <option value="facade">Ravalement façade</option>
+                        <option value="toiture">Toiture</option>
+                        <option value="sdb">Salle de bain</option>
+                        <option value="cuisine">Cuisine</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="surface">Surface en m²</label>
+                    <input type="number" id="surface" placeholder="Ex: 120" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="quality">Niveau de finition</label>
+                    <select id="quality" required>
+                        <option value="standard">Standard</option>
+                        <option value="premium">Premium</option>
+                        <option value="luxe">Luxe</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="justify-self: center;">
+                    <i class="fas fa-calculator"></i> Calculer mon devis
+                </button>
+            </form>
+            
+            <div class="calc-result" id="result">
+                <p>Estimation pour votre projet :</p>
+                <div class="price">CHF <span id="price">0</span>.-</div>
+                <p>*Prix indicatif TTC - Devis détaillé gratuit sur demande</p>
+                <a href="tel:0215050062" class="btn btn-secondary" style="margin-top: 20px;">
+                    <i class="fas fa-phone"></i> Discuter de mon projet
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services -->
+    <section class="services">
+        <h2 class="section-title animate-on-scroll">Nos services d'excellence</h2>
+        <div class="services-grid">
+            <div class="service-card animate-on-scroll">
+                <i class="fas fa-home service-icon"></i>
+                <h3>Construction Neuve</h3>
+                <p>Réalisation complète de votre projet de construction, de la conception à la remise des clés.</p>
+                <ul style="margin-top: 15px; padding-left: 20px;">
+                    <li>Villas individuelles</li>
+                    <li>Immeubles résidentiels</li>
+                    <li>Bâtiments commerciaux</li>
+                </ul>
+            </div>
+            
+            <div class="service-card animate-on-scroll">
+                <i class="fas fa-tools service-icon"></i>
+                <h3>Rénovation Complète</h3>
+                <p>Transformation et modernisation de vos espaces avec des finitions haut de gamme.</p>
+                <ul style="margin-top: 15px; padding-left: 20px;">
+                    <li>Appartements</li>
+                    <li>Maisons</li>
+                    <li>Locaux commerciaux</li>
+                </ul>
+            </div>
+            
+            <div class="service-card animate-on-scroll">
+                <i class="fas fa-hard-hat service-icon"></i>
+                <h3>Maçonnerie & Gros Œuvre</h3>
+                <p>Expertise technique pour tous vos travaux de structure et fondations.</p>
+                <ul style="margin-top: 15px; padding-left: 20px;">
+                    <li>Fondations spéciales</li>
+                    <li>Murs porteurs</li>
+                    <li>Dalles et chapes</li>
+                </ul>
+            </div>
+            
+            <div class="service-card animate-on-scroll">
+                <i class="fas fa-expand-alt service-icon"></i>
+                <h3>Extension & Surélévation</h3>
+                <p>Agrandissez votre espace de vie avec des solutions sur mesure.</p>
+                <ul style="margin-top: 15px; padding-left: 20px;">
+                    <li>Extension horizontale</li>
+                    <li>Surélévation toiture</li>
+                    <li>Aménagement combles</li>
+                </ul>
+            </div>
+            
+            <div class="service-card animate-on-scroll">
+                <i class="fas fa-paint-roller service-icon"></i>
+                <h3>Façades & Isolation</h3>
+                <p>Embellissement et performance énergétique de votre bâtiment.</p>
+                <ul style="margin-top: 15px; padding-left: 20px;">
+                    <li>Ravalement façade</li>
+                    <li>Isolation thermique</li>
+                    <li>Peinture extérieure</li>
+                </ul>
+            </div>
+            
+            <div class="service-card animate-on-scroll">
+                <i class="fas fa-bolt service-icon"></i>
+                <h3>Second Œuvre</h3>
+                <p>Coordination complète de tous les corps de métier.</p>
+                <ul style="margin-top: 15px; padding-left: 20px;">
+                    <li>Électricité</li>
+                    <li>Plomberie</li>
+                    <li>Carrelage</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Témoignages -->
+    <section class="testimonials">
+        <h2 class="section-title animate-on-scroll">Ce que disent nos clients</h2>
+        <div class="testimonials-slider">
+            <div class="testimonial">
+                <p class="testimonial-text">
+                    "Travail impeccable ! L'équipe de Globibat a rénové notre villa avec un professionnalisme exemplaire. Délais respectés et finitions parfaites."
+                </p>
+                <p class="testimonial-author">Marie L. - Nyon</p>
+                <div class="testimonial-stars">★★★★★</div>
+            </div>
+            
+            <div class="testimonial">
+                <p class="testimonial-text">
+                    "Excellent rapport qualité-prix. Ils ont transformé notre appartement ancien en un espace moderne et fonctionnel. Je recommande vivement !"
+                </p>
+                <p class="testimonial-author">Thomas B. - Gland</p>
+                <div class="testimonial-stars">★★★★★</div>
+            </div>
+            
+            <div class="testimonial">
+                <p class="testimonial-text">
+                    "Construction de notre maison de A à Z. Équipe à l'écoute, conseils précieux et résultat au-delà de nos attentes. Merci Globibat !"
+                </p>
+                <p class="testimonial-author">Sophie et Marc D. - Prangins</p>
+                <div class="testimonial-stars">★★★★★</div>
+            </div>
+            
+            <div class="testimonial">
+                <p class="testimonial-text">
+                    "Professionnels sérieux et compétents. Notre extension a été réalisée dans les temps avec une qualité irréprochable."
+                </p>
+                <p class="testimonial-author">Jean-Claude M. - Coppet</p>
+                <div class="testimonial-stars">★★★★★</div>
+            </div>
+            
+            <!-- Duplication pour l'animation continue -->
+            <div class="testimonial">
+                <p class="testimonial-text">
+                    "Travail impeccable ! L'équipe de Globibat a rénové notre villa avec un professionnalisme exemplaire. Délais respectés et finitions parfaites."
+                </p>
+                <p class="testimonial-author">Marie L. - Nyon</p>
+                <div class="testimonial-stars">★★★★★</div>
+            </div>
+            
+            <div class="testimonial">
+                <p class="testimonial-text">
+                    "Excellent rapport qualité-prix. Ils ont transformé notre appartement ancien en un espace moderne et fonctionnel. Je recommande vivement !"
+                </p>
+                <p class="testimonial-author">Thomas B. - Gland</p>
+                <div class="testimonial-stars">★★★★★</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact et Map -->
+    <section class="contact">
+        <div class="contact-container">
+            <div class="contact-info animate-on-scroll">
+                <h2>Visitez notre showroom à Nyon</h2>
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div>
+                        <strong>Globibat SA</strong><br>
+                        Rie des Tattes d'Oie 93<br>
+                        1260 Nyon
+                    </div>
+                </div>
+                
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <a href="tel:0215050062" style="color: white; text-decoration: none;">021 505 00 62</a>
+                </div>
+                
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <a href="mailto:info@globibat.com" style="color: white; text-decoration: none;">info@globibat.com</a>
+                </div>
+                
+                <div class="contact-item">
+                    <i class="fas fa-clock"></i>
+                    <div>
+                        Lun-Ven : 08h00 - 18h00<br>
+                        Sam : 08h00 - 12h00
+                    </div>
+                </div>
+                
+                <a href="https://maps.google.com/maps?q=Globibat+Nyon" target="_blank" class="btn btn-primary" style="margin-top: 30px;">
+                    <i class="fas fa-directions"></i> Itinéraire
+                </a>
+            </div>
+            
+            <div class="map-container animate-on-scroll">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2749.0845661297847!2d6.2326!3d46.3833!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x478c65c5c5c5c5c5%3A0x5c5c5c5c5c5c5c5c!2sGlobibat%2C%20Rie%20des%20Tattes%20d&#39;Oie%2093%2C%201260%20Nyon!5e0!3m2!1sfr!2sch!4v1234567890" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- Galerie de Projets -->
+    <section class="projects" id="projets">
+        <h2 class="section-title animate-on-scroll">Nos Réalisations</h2>
+        
+        <!-- Filtres -->
+        <div class="project-filters animate-on-scroll">
+            <button class="filter-btn active" data-filter="all">Tous</button>
+            <button class="filter-btn" data-filter="renovation">Rénovation</button>
+            <button class="filter-btn" data-filter="construction">Construction</button>
+            <button class="filter-btn" data-filter="extension">Extension</button>
+            <button class="filter-btn" data-filter="commercial">Commercial</button>
+        </div>
+        
+        <!-- Grille de projets -->
+        <div class="projects-grid">
+            <div class="project-card animate-on-scroll" data-category="renovation">
+                <div class="project-image">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23004a99' width='400' height='300'/%3E%3Ctext fill='white' font-size='20' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3EVilla Moderne Nyon%3C/text%3E%3C/svg%3E" alt="Villa Moderne Nyon">
+                    <div class="project-overlay">
+                        <h4>Villa Moderne - Nyon</h4>
+                        <p>Rénovation complète 250m²</p>
+                        <span class="project-price">CHF 450'000.-</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="project-card animate-on-scroll" data-category="construction">
+                <div class="project-image">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23ff6b35' width='400' height='300'/%3E%3Ctext fill='white' font-size='20' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3EImmeuble Prangins%3C/text%3E%3C/svg%3E" alt="Immeuble Prangins">
+                    <div class="project-overlay">
+                        <h4>Immeuble Résidentiel - Prangins</h4>
+                        <p>Construction neuve 8 appartements</p>
+                        <span class="project-price">CHF 3'200'000.-</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="project-card animate-on-scroll" data-category="commercial">
+                <div class="project-image">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23004a99' width='400' height='300'/%3E%3Ctext fill='white' font-size='20' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3EBureau Gland%3C/text%3E%3C/svg%3E" alt="Bureau Gland">
+                    <div class="project-overlay">
+                        <h4>Bureaux Modernes - Gland</h4>
+                        <p>Aménagement 500m²</p>
+                        <span class="project-price">CHF 280'000.-</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="project-card animate-on-scroll" data-category="extension">
+                <div class="project-image">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23ff6b35' width='400' height='300'/%3E%3Ctext fill='white' font-size='20' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3ESurélévation Coppet%3C/text%3E%3C/svg%3E" alt="Surélévation Coppet">
+                    <div class="project-overlay">
+                        <h4>Surélévation - Coppet</h4>
+                        <p>Ajout 2 étages + terrasse</p>
+                        <span class="project-price">CHF 380'000.-</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="project-card animate-on-scroll" data-category="renovation">
+                <div class="project-image">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23004a99' width='400' height='300'/%3E%3Ctext fill='white' font-size='20' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3EAppartement Rolle%3C/text%3E%3C/svg%3E" alt="Appartement Rolle">
+                    <div class="project-overlay">
+                        <h4>Appartement Luxe - Rolle</h4>
+                        <p>Rénovation haut de gamme</p>
+                        <span class="project-price">CHF 185'000.-</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="project-card animate-on-scroll" data-category="construction">
+                <div class="project-image">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23ff6b35' width='400' height='300'/%3E%3Ctext fill='white' font-size='20' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3EMaison Founex%3C/text%3E%3C/svg%3E" alt="Maison Founex">
+                    <div class="project-overlay">
+                        <h4>Maison Individuelle - Founex</h4>
+                        <p>Construction villa 180m²</p>
+                        <span class="project-price">CHF 890'000.-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Compteurs Statistiques -->
+    <section class="stats">
+        <div class="stats-container">
+            <div class="stat animate-on-scroll">
+                <i class="fas fa-calendar-alt"></i>
+                <div class="stat-number" data-target="21">0</div>
+                <p>Années d'expérience</p>
+            </div>
+            <div class="stat animate-on-scroll">
+                <i class="fas fa-hard-hat"></i>
+                <div class="stat-number" data-target="847">0</div>
+                <p>Projets réalisés</p>
+            </div>
+            <div class="stat animate-on-scroll">
+                <i class="fas fa-users"></i>
+                <div class="stat-number" data-target="98">0</div>
+                <p>% Clients satisfaits</p>
+            </div>
+            <div class="stat animate-on-scroll">
+                <i class="fas fa-award"></i>
+                <div class="stat-number" data-target="5">0</div>
+                <p>Certifications</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Système de Prise de RDV -->
+    <section class="appointment" id="rdv">
+        <h2 class="section-title animate-on-scroll">Prenez Rendez-vous</h2>
+        <div class="appointment-container animate-on-scroll">
+            <div class="appointment-info">
+                <h3>Consultation Gratuite</h3>
+                <p>Nos experts sont à votre disposition pour discuter de votre projet et vous conseiller sur les meilleures solutions.</p>
+                <ul>
+                    <li><i class="fas fa-check"></i> Visite sur site gratuite</li>
+                    <li><i class="fas fa-check"></i> Devis détaillé sous 48h</li>
+                    <li><i class="fas fa-check"></i> Conseils personnalisés</li>
+                    <li><i class="fas fa-check"></i> Sans engagement</li>
+                </ul>
+            </div>
+            
+            <form class="appointment-form" id="appointmentForm">
+                <div class="form-row">
+                    <input type="text" placeholder="Nom et Prénom" required>
+                    <input type="tel" placeholder="Téléphone" required>
+                </div>
+                <div class="form-row">
+                    <input type="email" placeholder="Email" required>
+                    <input type="text" placeholder="Code postal" required>
+                </div>
+                <div class="form-row">
+                    <input type="date" required>
+                    <select required>
+                        <option value="">Créneau horaire</option>
+                        <option>08h00 - 10h00</option>
+                        <option>10h00 - 12h00</option>
+                        <option>14h00 - 16h00</option>
+                        <option>16h00 - 18h00</option>
+                    </select>
+                </div>
+                <textarea placeholder="Décrivez brièvement votre projet" rows="4" required></textarea>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-calendar-check"></i> Réserver mon rendez-vous
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- FAQ Interactive -->
+    <section class="faq">
+        <h2 class="section-title animate-on-scroll">Questions Fréquentes</h2>
+        <div class="faq-container animate-on-scroll">
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <h3>Quels sont vos délais de réalisation ?</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Les délais varient selon l'ampleur du projet. En général : rénovation d'appartement 4-8 semaines, construction villa 6-8 mois, extension 2-3 mois. Nous respectons toujours les délais convenus.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <h3>Proposez-vous des garanties sur vos travaux ?</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Oui, tous nos travaux sont garantis : garantie décennale pour le gros œuvre, 5 ans pour l'étanchéité, 2 ans pour les finitions. Nous sommes assurés RC professionnelle.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <h3>Comment se déroule la première consultation ?</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Nous venons sur place gratuitement pour évaluer votre projet, prendre les mesures et discuter de vos besoins. Un devis détaillé vous est envoyé sous 48h.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <h3>Travaillez-vous avec des architectes ?</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Oui, nous avons un réseau d'architectes partenaires. Nous pouvons aussi travailler avec l'architecte de votre choix. Pour les projets simples, nos plans internes suffisent.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter & Blog -->
+    <section class="newsletter-blog">
+        <div class="newsletter animate-on-scroll">
+            <h3>Restez Informé</h3>
+            <p>Recevez nos conseils construction et nos offres exclusives</p>
+            <form class="newsletter-form">
+                <input type="email" placeholder="Votre email" required>
+                <button type="submit" class="btn btn-primary">S'inscrire</button>
+            </form>
+        </div>
+        
+        <div class="latest-posts animate-on-scroll">
+            <h3>Actualités & Conseils</h3>
+            <div class="blog-posts">
+                <article class="blog-post">
+                    <span class="post-date">15 Jan 2024</span>
+                    <h4>Nouvelles normes énergétiques 2024</h4>
+                    <p>Tout savoir sur les changements réglementaires...</p>
+                    <a href="#" class="read-more">Lire plus →</a>
+                </article>
+                <article class="blog-post">
+                    <span class="post-date">08 Jan 2024</span>
+                    <h4>Tendances rénovation 2024</h4>
+                    <p>Les matériaux et styles qui marqueront l'année...</p>
+                    <a href="#" class="read-more">Lire plus →</a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <h3>Globibat SA - Votre partenaire construction depuis 2003</h3>
+            <div class="social-links">
+                <a href="#" title="Facebook"><i class="fab fa-facebook"></i></a>
+                <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://g.page/globibat" title="Google Business"><i class="fab fa-google"></i></a>
+            </div>
+            <p style="margin-top: 20px; opacity: 0.8;">
+                © 2024 Globibat SA - Tous droits réservés | 
+                <a href="/mentions-legales" style="color: white;">Mentions légales</a> | 
+                <a href="/cgv" style="color: white;">CGV</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Chat Widget -->
+    <div class="chat-widget">
+        <div class="chat-button" onclick="openChat()">
+            <i class="fas fa-comments"></i>
+        </div>
+    </div>
+
+    <!-- Scroll to top -->
+    <div class="scroll-top" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- Mode Sombre Toggle -->
+    <div class="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-moon"></i>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Calculateur de devis
+        document.getElementById('devisForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const projectType = document.getElementById('project-type').value;
+            const surface = parseFloat(document.getElementById('surface').value);
+            const quality = document.getElementById('quality').value;
+            
+            // Prix de base par m² selon le type de projet
+            const basePrices = {
+                renovation: 800,
+                construction: 2500,
+                extension: 2000,
+                facade: 150,
+                toiture: 200,
+                sdb: 1000,
+                cuisine: 1200
+            };
+            
+            // Multiplicateurs selon la qualité
+            const qualityMultipliers = {
+                standard: 1,
+                premium: 1.5,
+                luxe: 2
+            };
+            
+            const basePrice = basePrices[projectType] || 1000;
+            const multiplier = qualityMultipliers[quality] || 1;
+            const totalPrice = Math.round(surface * basePrice * multiplier);
+            
+            document.getElementById('price').textContent = totalPrice.toLocaleString('fr-CH');
+            document.getElementById('result').classList.add('show');
+        });
+        
+        // Animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+        
+        // Scroll to top
+        window.addEventListener('scroll', function() {
+            const scrollTop = document.querySelector('.scroll-top');
+            if (window.pageYOffset > 300) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+        
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+        
+        // Chat simulation
+        function openChat() {
+            alert('Chat en direct disponible du lundi au vendredi de 8h à 18h. Pour une réponse immédiate, appelez le 021 505 00 62');
+        }
+        
+        // Smooth scroll pour les ancres
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Filtres de projets
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const projectCards = document.querySelectorAll('.project-card');
+        
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Retirer active de tous les boutons
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                // Ajouter active au bouton cliqué
+                this.classList.add('active');
+                
+                const filter = this.getAttribute('data-filter');
+                
+                projectCards.forEach(card => {
+                    if (filter === 'all' || card.getAttribute('data-category') === filter) {
+                        card.style.display = 'block';
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'scale(1)';
+                        }, 10);
+                    } else {
+                        card.style.opacity = '0';
+                        card.style.transform = 'scale(0.8)';
+                        setTimeout(() => {
+                            card.style.display = 'none';
+                        }, 300);
+                    }
+                });
+            });
+        });
+        
+        // Compteurs animés
+        const counters = document.querySelectorAll('.stat-number');
+        const speed = 200;
+        
+        const animateCounters = () => {
+            counters.forEach(counter => {
+                const animate = () => {
+                    const value = +counter.getAttribute('data-target');
+                    const data = +counter.innerText;
+                    const time = value / speed;
+                    
+                    if (data < value) {
+                        counter.innerText = Math.ceil(data + time);
+                        setTimeout(animate, 10);
+                    } else {
+                        counter.innerText = value;
+                    }
+                }
+                animate();
+            });
+        }
+        
+        // Observer pour déclencher les compteurs
+        const statsSection = document.querySelector('.stats');
+        const statsObserver = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                animateCounters();
+                statsObserver.unobserve(statsSection);
+            }
+        }, { threshold: 0.5 });
+        
+        if (statsSection) {
+            statsObserver.observe(statsSection);
+        }
+        
+        // FAQ Toggle
+        function toggleFaq(element) {
+            const faqItem = element.parentElement;
+            const isActive = faqItem.classList.contains('active');
+            
+            // Fermer tous les FAQ
+            document.querySelectorAll('.faq-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Ouvrir celui cliqué si pas déjà actif
+            if (!isActive) {
+                faqItem.classList.add('active');
+            }
+        }
+        
+        // Mode Sombre
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            
+            const icon = document.querySelector('.theme-toggle i');
+            icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+        }
+        
+        // Charger le thème sauvegardé
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            document.querySelector('.theme-toggle i').className = 'fas fa-sun';
+        }
+        
+        // Formulaire de RDV
+        document.getElementById('appointmentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Animation de succès
+            const button = this.querySelector('button[type="submit"]');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check"></i> Rendez-vous confirmé !';
+            button.style.background = '#28a745';
+            
+            // Réinitialiser après 3 secondes
+            setTimeout(() => {
+                this.reset();
+                button.innerHTML = originalText;
+                button.style.background = '';
+                
+                // Message de confirmation
+                alert('Merci ! Nous vous contacterons dans les 24h pour confirmer votre rendez-vous.');
+            }, 2000);
+        });
+        
+        // Newsletter
+        document.querySelector('.newsletter-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = this.querySelector('input[type="email"]').value;
+            
+            // Animation de succès
+            const button = this.querySelector('button');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check"></i> Inscrit !';
+            button.style.background = '#28a745';
+            
+            setTimeout(() => {
+                this.reset();
+                button.innerHTML = originalText;
+                button.style.background = '';
+            }, 2000);
+        });
+        
+        // Préchargement des images pour performance
+        const preloadImages = () => {
+            const images = [
+                'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg"%3E%3C/svg%3E'
+            ];
+            
+            images.forEach(src => {
+                const img = new Image();
+                img.src = src;
+            });
+        };
+        
+        window.addEventListener('load', preloadImages);
+        
+        // Service Worker pour PWA (optionnel)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
+        }
+    </script>
+
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "GeneralContractor",
+        "name": "Globibat SA",
+        "description": "Entreprise générale de construction à Nyon, notée 5/5 sur Google. Spécialiste rénovation, maçonnerie et transformation.",
+        "url": "https://www.globibat.com",
+        "telephone": "+41215050062",
+        "email": "info@globibat.com",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Rie des Tattes d'Oie 93",
+            "addressLocality": "Nyon",
+            "addressRegion": "VD",
+            "postalCode": "1260",
+            "addressCountry": "CH"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 46.3833,
+            "longitude": 6.2348
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "5",
+            "ratingCount": "25"
+        },
+        "openingHoursSpecification": [
+            {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                "opens": "08:00",
+                "closes": "18:00"
+            },
+            {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": "Saturday",
+                "opens": "08:00",
+                "closes": "12:00"
+            }
+        ],
+        "areaServed": {
+            "@type": "GeoCircle",
+            "geoMidpoint": {
+                "@type": "GeoCoordinates",
+                "latitude": 46.3833,
+                "longitude": 6.2348
+            },
+            "geoRadius": "50000"
+        }
+    }
+    </script>
+</body>
+</html>

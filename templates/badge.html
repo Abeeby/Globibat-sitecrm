@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Badgeage - Système de Pointage{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white text-center">
+                <h2><i class="fas fa-fingerprint"></i> Système de Badgeage</h2>
+                <p class="mb-0 fs-4 current-time"></p>
+            </div>
+            <div class="card-body p-5">
+                <form method="POST" action="{{ url_for('badge') }}" id="badgeForm">
+                    <div class="mb-4">
+                        <label for="matricule" class="form-label fs-5">
+                            <i class="fas fa-id-card"></i> Matricule Employé
+                        </label>
+                        <input type="text" 
+                               class="form-control form-control-lg text-center" 
+                               id="matricule" 
+                               name="matricule" 
+                               placeholder="Entrez votre matricule" 
+                               required 
+                               autofocus>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label fs-5">
+                            <i class="fas fa-clock"></i> Type de Badgeage
+                        </label>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <input type="radio" class="btn-check" name="type_badge" id="arrivee_matin" value="arrivee_matin" required>
+                                <label class="btn btn-outline-success w-100 p-3" for="arrivee_matin">
+                                    <i class="fas fa-sun fa-2x d-block mb-2"></i>
+                                    <strong>Arrivée Matin</strong>
+                                    <br>
+                                    <small>(Avant 9h00)</small>
+                                </label>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <input type="radio" class="btn-check" name="type_badge" id="depart_midi" value="depart_midi">
+                                <label class="btn btn-outline-warning w-100 p-3" for="depart_midi">
+                                    <i class="fas fa-utensils fa-2x d-block mb-2"></i>
+                                    <strong>Départ Midi</strong>
+                                    <br>
+                                    <small>(Pause déjeuner)</small>
+                                </label>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <input type="radio" class="btn-check" name="type_badge" id="arrivee_apres_midi" value="arrivee_apres_midi">
+                                <label class="btn btn-outline-info w-100 p-3" for="arrivee_apres_midi">
+                                    <i class="fas fa-clock fa-2x d-block mb-2"></i>
+                                    <strong>Retour Après-midi</strong>
+                                    <br>
+                                    <small>(Avant 14h00)</small>
+                                </label>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <input type="radio" class="btn-check" name="type_badge" id="depart_soir" value="depart_soir">
+                                <label class="btn btn-outline-danger w-100 p-3" for="depart_soir">
+                                    <i class="fas fa-moon fa-2x d-block mb-2"></i>
+                                    <strong>Départ Soir</strong>
+                                    <br>
+                                    <small>(Fin de journée)</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                            <i class="fas fa-check-circle"></i> Valider le Badgeage
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Instructions -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-info-circle"></i> Instructions</h5>
+                <ol>
+                    <li>Entrez votre matricule employé</li>
+                    <li>Sélectionnez le type de badgeage correspondant</li>
+                    <li>Cliquez sur "Valider le Badgeage"</li>
+                    <li>Attendez la confirmation avant de quitter</li>
+                </ol>
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    <strong>Important :</strong> N'oubliez pas de badger à chaque entrée et sortie !
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-sélection du type de badge selon l'heure
+document.addEventListener('DOMContentLoaded', function() {
+    const now = new Date();
+    const hour = now.getHours();
+    
+    if (hour >= 7 && hour < 10) {
+        document.getElementById('arrivee_matin').checked = true;
+    } else if (hour >= 11 && hour < 13) {
+        document.getElementById('depart_midi').checked = true;
+    } else if (hour >= 13 && hour < 15) {
+        document.getElementById('arrivee_apres_midi').checked = true;
+    } else if (hour >= 16 && hour < 20) {
+        document.getElementById('depart_soir').checked = true;
+    }
+    
+    // Confirmation avant soumission
+    document.getElementById('badgeForm').addEventListener('submit', function(e) {
+        const matricule = document.getElementById('matricule').value;
+        const typeBadge = document.querySelector('input[name="type_badge"]:checked');
+        
+        if (!matricule || !typeBadge) {
+            e.preventDefault();
+            alert('Veuillez remplir tous les champs !');
+            return;
+        }
+        
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('submitBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Traitement...';
+    });
+});
+</script>
+{% endblock %} 

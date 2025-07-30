@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de bord Admin - Système de Badgeage{% endblock %}
+
+{% block content %}
+<h1><i class="fas fa-tachometer-alt"></i> Tableau de bord</h1>
+<p class="text-muted">Date : {{ aujourd_hui.strftime('%d/%m/%Y') }}</p>
+
+<!-- Statistiques générales -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-users"></i> Employés actifs</h5>
+                <p class="card-text display-4">{{ nb_employes }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-user-check"></i> Présents aujourd'hui</h5>
+                <p class="card-text display-4">{{ pointages_jour|length }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-user-clock"></i> Retards</h5>
+                <p class="card-text display-4">
+                    {{ pointages_jour|selectattr('0.retard_matin')|list|length + 
+                       pointages_jour|selectattr('0.retard_apres_midi')|list|length }}
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-user-times"></i> Absents</h5>
+                <p class="card-text display-4">{{ absents|length }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Actions rapides -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="btn-group" role="group">
+            <a href="{{ url_for('ajouter_employe') }}" class="btn btn-success">
+                <i class="fas fa-user-plus"></i> Ajouter un employé
+            </a>
+            <a href="{{ url_for('liste_employes') }}" class="btn btn-primary">
+                <i class="fas fa-users"></i> Gérer les employés
+            </a>
+            <button class="btn btn-info" onclick="genererRapport('jour')">
+                <i class="fas fa-file-excel"></i> Rapport du jour (Excel)
+            </button>
+            <button class="btn btn-warning" onclick="genererRapport('semaine')">
+                <i class="fas fa-calendar-week"></i> Rapport hebdomadaire
+            </button>
+            <button class="btn btn-secondary" onclick="genererRapport('mois')">
+                <i class="fas fa-calendar"></i> Rapport mensuel
+            </button>
+            <a href="{{ url_for('statistiques_avancees') }}" class="btn btn-dark">
+                <i class="fas fa-chart-line"></i> Statistiques avancées
+            </a>
+            {% if not current_user.is_2fa_enabled %}
+            <a href="{{ url_for('setup_2fa') }}" class="btn btn-danger">
+                <i class="fas fa-shield-alt"></i> Activer 2FA
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Pointages du jour -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5><i class="fas fa-clock"></i> Pointages du jour</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Matricule</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Département</th>
+                        <th>Arrivée Matin</th>
+                        <th>Départ Midi</th>
+                        <th>Arrivée Après-midi</th>
+                        <th>Départ Soir</th>
+                        <th>Heures travaillées</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pointage, employe in pointages_jour %}
+                    <tr>
+                        <td>{{ employe.matricule }}</td>
+                        <td>{{ employe.nom }}</td>
+                        <td>{{ employe.prenom }}</td>
+                        <td>{{ employe.departement or '-' }}</td>
+                        <td>
+                            {% if pointage.arrivee_matin %}
+                                {{ pointage.arrivee_matin.strftime('%H:%M') }}
+                                {% if pointage.retard_matin %}
+                                    <span class="badge bg-warning">Retard</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ pointage.depart_midi.strftime('%H:%M') if pointage.depart_midi else '-' }}
+                        </td>
+                        <td>
+                            {% if pointage.arrivee_apres_midi %}
+                                {{ pointage.arrivee_apres_midi.strftime('%H:%M') }}
+                                {% if pointage.retard_apres_midi %}
+                                    <span class="badge bg-warning">Retard</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ pointage.depart_soir.strftime('%H:%M') if pointage.depart_soir else '-' }}
+                        </td>
+                        <td>
+                            <strong>{{ pointage.heures_travaillees }}h</strong>
+                        </td>
+                        <td>
+                            {% if pointage.depart_soir %}
+                                <span class="badge bg-success">Journée complète</span>
+                            {% elif pointage.arrivee_matin or pointage.arrivee_apres_midi %}
+                                <span class="badge bg-info">En cours</span>
+                            {% else %}
+                                <span class="badge bg-danger">Absent</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Liste des absents -->
+{% if absents %}
+<div class="card">
+    <div class="card-header bg-danger text-white">
+        <h5><i class="fas fa-user-times"></i> Employés absents</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Matricule</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Département</th>
+                        <th>Email</th>
+                        <th>Téléphone</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employe in absents %}
+                    <tr>
+                        <td>{{ employe.matricule }}</td>
+                        <td>{{ employe.nom }}</td>
+                        <td>{{ employe.prenom }}</td>
+                        <td>{{ employe.departement or '-' }}</td>
+                        <td>{{ employe.email or '-' }}</td>
+                        <td>{{ employe.telephone or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script>
+function genererRapport(type) {
+    if (type === 'jour') {
+        window.location.href = "{{ url_for('generer_rapport', type_rapport='jour') }}?date={{ aujourd_hui.isoformat() }}";
+    } else if (type === 'semaine') {
+        alert('Rapport hebdomadaire en cours de développement');
+    } else if (type === 'mois') {
+        genererRapportMensuel();
+    }
+}
+
+function genererRapportMensuel() {
+    const mois = prompt('Entrez le numéro du mois (1-12):', new Date().getMonth() + 1);
+    const annee = prompt('Entrez l\'année:', new Date().getFullYear());
+    
+    if (mois && annee) {
+        window.location.href = `/admin/rapport/mensuel?mois=${mois}&annee=${annee}`;
+    }
+}
+
+// Charger les statistiques dynamiquement
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/api/stats/dashboard')
+        .then(response => response.json())
+        .then(data => {
+            // Mettre à jour les stats si nécessaire
+            console.log('Stats chargées:', data);
+        });
+});
+</script>
+{% endblock %} 

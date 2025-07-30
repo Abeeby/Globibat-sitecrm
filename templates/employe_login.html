@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Connexion Employé - {{ config.COMPANY_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-4">
+                        <i class="fas fa-user-circle text-primary"></i> Connexion Employé
+                    </h2>
+                    
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="matricule" class="form-label">
+                                <i class="fas fa-id-card"></i> Matricule
+                            </label>
+                            <input type="text" 
+                                   class="form-control form-control-lg" 
+                                   id="matricule" 
+                                   name="matricule" 
+                                   required 
+                                   autofocus
+                                   placeholder="Entrez votre matricule">
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-sign-in-alt"></i> Se connecter
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-center">
+                        <a href="{{ url_for('badge') }}" class="btn btn-link">
+                            <i class="fas fa-clock"></i> Badger sans connexion
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-3">
+                <a href="{{ url_for('portail_employe') }}" class="text-muted">
+                    <i class="fas fa-arrow-left"></i> Retour
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

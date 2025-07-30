@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Mon Espace - {{ employe.prenom }} {{ employe.nom }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- En-tête avec infos employé -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>
+                <i class="fas fa-user-circle text-primary"></i> 
+                Bonjour {{ employe.prenom }} !
+            </h1>
+            <p class="lead">Matricule : {{ employe.matricule }} | Département : {{ employe.departement or 'Non défini' }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('employe_logout') }}" class="btn btn-outline-danger">
+                <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistiques du mois -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-clock"></i> Heures ce mois
+                    </h5>
+                    <h2>{{ total_heures|round(2) }}h</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-exclamation-triangle"></i> Retards
+                    </h5>
+                    <h2>{{ nb_retards }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-calendar-check"></i> Jours travaillés
+                    </h5>
+                    <h2>{{ pointages|length }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <a href="{{ url_for('badge') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-id-card"></i> Badger maintenant
+            </a>
+        </div>
+    </div>
+
+    <!-- Historique des pointages -->
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-history"></i> Mes pointages ce mois</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Arrivée matin</th>
+                            <th>Départ midi</th>
+                            <th>Arrivée après-midi</th>
+                            <th>Départ soir</th>
+                            <th>Heures</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in pointages %}
+                        <tr>
+                            <td>{{ p.date_pointage.strftime('%d/%m/%Y') }}</td>
+                            <td>
+                                {% if p.arrivee_matin %}
+                                    {{ p.arrivee_matin.strftime('%H:%M') }}
+                                    {% if p.retard_matin %}
+                                        <span class="badge bg-warning">Retard</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ p.depart_midi.strftime('%H:%M') if p.depart_midi else '-' }}
+                            </td>
+                            <td>
+                                {% if p.arrivee_apres_midi %}
+                                    {{ p.arrivee_apres_midi.strftime('%H:%M') }}
+                                    {% if p.retard_apres_midi %}
+                                        <span class="badge bg-warning">Retard</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ p.depart_soir.strftime('%H:%M') if p.depart_soir else '-' }}
+                            </td>
+                            <td>
+                                <strong>{{ p.heures_travaillees }}h</strong>
+                            </td>
+                            <td>
+                                {% if p.absence %}
+                                    <span class="badge bg-danger">Absent</span>
+                                {% elif p.heures_travaillees >= 7 %}
+                                    <span class="badge bg-success">Complet</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Partiel</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">
+                                Aucun pointage ce mois-ci
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
