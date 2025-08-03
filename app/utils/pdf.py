@@ -134,19 +134,147 @@ def generate_quote_pdf(quote):
     buffer.seek(0)
     return buffer
 
-def generate_payslip_pdf(employee, month, year, payroll):
+def generate_timesheet_pdf(employee, attendances, start_date, end_date):
+    """Générer une feuille de temps PDF"""
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4)
+    story = []
+    styles = getSampleStyleSheet()
+    
+    # En-tête
+    header_data = [
+        ['GLOBIBAT SA', '', 'FEUILLE DE TEMPS'],
+        ['', '', f'{start_date.strftime("%d.%m.%Y")} - {end_date.strftime("%d.%m.%Y")}']
+    ]
+    
+    header_table = Table(header_data, colWidths=[100*mm, 40*mm, 60*mm])
+    header_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('ALIGN', (2, 0), (2, -1), 'RIGHT'),
+        ('FONTNAME', (0, 0), (0, 0), 'Helvetica-Bold'),
+        ('FONTNAME', (2, 0), (2, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (0, 0), 14),
+        ('FONTSIZE', (2, 0), (2, 0), 14),
+    ]))
+    story.append(header_table)
+    story.append(Spacer(1, 15*mm))
+    
+    # Informations employé
+    employee_info = [
+        ['Employé:', employee.full_name],
+        ['Matricule:', employee.employee_code],
+        ['Département:', employee.department or '-']
+    ]
+    
+    employee_table = Table(employee_info, colWidths=[30*mm, 90*mm])
+    employee_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+    ]))
+    story.append(employee_table)
+    story.append(Spacer(1, 10*mm))
+    
+    # Tableau des présences
+    attendance_data = [
+        ['Date', 'Jour', 'Arrivée', 'Départ midi', 'Retour', 'Départ', 'Total', 'Heures sup.', 'Lieu/Projet']
+    ]
+    
+    total_hours = 0
+    total_overtime = 0
+    
+    for att in attendances:
+        day_name = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'][att.date.weekday()]
+        
+        attendance_data.append([
+            att.date.strftime('%d.%m'),
+            day_name,
+            att.check_in_morning.strftime('%H:%M') if att.check_in_morning else '-',
+            att.check_out_lunch.strftime('%H:%M') if att.check_out_lunch else '-',
+            att.check_in_afternoon.strftime('%H:%M') if att.check_in_afternoon else '-',
+            att.check_out_evening.strftime('%H:%M') if att.check_out_evening else '-',
+            f'{att.total_hours:.2f}' if att.total_hours else '0.00',
+            f'{att.overtime_hours:.2f}' if att.overtime_hours else '-',
+            att.location_name or (att.project.name if att.project else '-')
+        ])
+        
+        total_hours += att.total_hours or 0
+        total_overtime += att.overtime_hours or 0
+    
+    # Ligne de total
+    attendance_data.append(['', '', '', '', '', 'TOTAL:', f'{total_hours:.2f}', f'{total_overtime:.2f}', ''])
+    
+    attendance_table = Table(attendance_data, colWidths=[18*mm, 15*mm, 20*mm, 20*mm, 20*mm, 20*mm, 20*mm, 20*mm, 42*mm])
+    attendance_table.setStyle(TableStyle([
+        ('ALIGN', (2, 0), (-1, -1), 'CENTER'),
+        ('ALIGN', (0, 0), (1, -1), 'LEFT'),
+        ('ALIGN', (-1, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTNAME', (5, -1), (-1, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('LINEBELOW', (0, 0), (-1, 0), 1, colors.black),
+        ('LINEABOVE', (5, -1), (-1, -1), 1, colors.black),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ('GRID', (0, 0), (-1, -2), 0.5, colors.grey),
+    ]))
+    story.append(attendance_table)
+    
+    # Résumé
+    story.append(Spacer(1, 15*mm))
+    summary_data = [
+        ['Résumé de la période', ''],
+        ['Jours travaillés:', f'{len(attendances)}'],
+        ['Heures normales:', f'{total_hours - total_overtime:.2f}'],
+        ['Heures supplémentaires:', f'{total_overtime:.2f}'],
+        ['Total heures:', f'{total_hours:.2f}']
+    ]
+    
+    summary_table = Table(summary_data, colWidths=[50*mm, 30*mm])
+    summary_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
+        ('ALIGN', (1, 0), (1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+        ('LINEBELOW', (0, 0), (-1, 0), 1, colors.black),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+    ]))
+    story.append(summary_table)
+    
+    # Signatures
+    story.append(Spacer(1, 30*mm))
+    signature_data = [
+        ['Signature de l\'employé:', '________________', 'Date:', '________________'],
+        ['', '', '', ''],
+        ['Validation manager:', '________________', 'Date:', '________________']
+    ]
+    
+    signature_table = Table(signature_data, colWidths=[40*mm, 50*mm, 20*mm, 40*mm])
+    signature_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 15),
+    ]))
+    story.append(signature_table)
+    
+    # Générer le PDF
+    doc.build(story)
+    buffer.seek(0)
+    return buffer
+
+def generate_payslip_pdf(payroll):
     """Générer une fiche de paie PDF"""
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4)
     story = []
     styles = getSampleStyleSheet()
     
+    employee = payroll.employee
+    
     # En-tête entreprise
     header_data = [
         ['GLOBIBAT SA', '', 'BULLETIN DE SALAIRE'],
-        ['Route de Chancy 123', '', f'{month:02d}/{year}'],
-        ['1213 Petit-Lancy', '', ''],
-        ['Genève, Suisse', '', '']
+        ['Rie des Tattes d\'Oie 93', '', f'{payroll.month:02d}/{payroll.year}'],
+        ['1260 Nyon', '', ''],
+        ['Vaud, Suisse', '', '']
     ]
     
     header_table = Table(header_data, colWidths=[100*mm, 40*mm, 60*mm])

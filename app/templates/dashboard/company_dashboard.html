@@ -1,0 +1,459 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de Bord - Globibat{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Header avec filtres -->
+    <div class="dashboard-header">
+        <h1>Tableau de Bord Entreprise</h1>
+        <div class="filters">
+            <select id="period-filter" class="form-control">
+                <option value="day">Aujourd'hui</option>
+                <option value="week" selected>Cette semaine</option>
+                <option value="month">Ce mois</option>
+                <option value="custom">Personnalisé</option>
+            </select>
+            <button class="btn btn-primary" onclick="refreshDashboard()">
+                <i class="fas fa-sync"></i> Actualiser
+            </button>
+        </div>
+    </div>
+
+    <!-- KPIs Cards -->
+    <div class="kpi-cards">
+        <div class="kpi-card present">
+            <div class="kpi-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="kpi-content">
+                <h3 id="present-count">0</h3>
+                <p>Présents</p>
+                <span class="kpi-detail" id="present-total">sur 0 employés</span>
+            </div>
+        </div>
+
+        <div class="kpi-card hours">
+            <div class="kpi-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="kpi-content">
+                <h3 id="total-hours">0h</h3>
+                <p>Heures aujourd'hui</p>
+                <span class="kpi-detail" id="overtime-hours">0h supplémentaires</span>
+            </div>
+        </div>
+
+        <div class="kpi-card costs">
+            <div class="kpi-icon">
+                <i class="fas fa-coins"></i>
+            </div>
+            <div class="kpi-content">
+                <h3 id="daily-cost">0 CHF</h3>
+                <p>Coûts du jour</p>
+                <span class="kpi-detail">Main d'œuvre + Dépenses</span>
+            </div>
+        </div>
+
+        <div class="kpi-card alerts">
+            <div class="kpi-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="kpi-content">
+                <h3 id="pending-approvals">0</h3>
+                <p>En attente</p>
+                <span class="kpi-detail">Approbations requises</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques -->
+    <div class="charts-row">
+        <div class="chart-container">
+            <h2>Présences de la semaine</h2>
+            <canvas id="attendance-chart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h2>Répartition par département</h2>
+            <canvas id="department-chart"></canvas>
+        </div>
+    </div>
+
+    <!-- Tableaux détaillés -->
+    <div class="data-tables">
+        <!-- Employés présents -->
+        <div class="table-section">
+            <h2>Employés présents aujourd'hui</h2>
+            <div class="table-responsive">
+                <table class="table table-striped" id="present-table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Département</th>
+                            <th>Arrivée</th>
+                            <th>Heures</th>
+                            <th>Lieu</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Données chargées dynamiquement -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Alertes de conformité -->
+        <div class="table-section">
+            <h2>Alertes de conformité</h2>
+            <div id="compliance-alerts">
+                <!-- Alertes chargées dynamiquement -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="quick-actions">
+        <h2>Actions rapides</h2>
+        <div class="action-buttons">
+            <button class="btn btn-success" onclick="generateReports()">
+                <i class="fas fa-file-pdf"></i> Générer rapports
+            </button>
+            <button class="btn btn-primary" onclick="showPayrollModal()">
+                <i class="fas fa-money-check"></i> Calculer paie
+            </button>
+            <button class="btn btn-warning" onclick="showExpenseApprovals()">
+                <i class="fas fa-receipt"></i> Dépenses en attente
+            </button>
+            <button class="btn btn-info" onclick="exportData()">
+                <i class="fas fa-download"></i> Exporter données
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour le calcul de paie -->
+<div class="modal fade" id="payrollModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Calculer la paie</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="payroll-form">
+                    <div class="form-group">
+                        <label>Mois</label>
+                        <select class="form-control" id="payroll-month" required>
+                            <!-- Options générées dynamiquement -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Employés</label>
+                        <select class="form-control" id="payroll-employees" multiple>
+                            <option value="all">Tous les employés actifs</option>
+                            <!-- Options d'employés -->
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" onclick="calculatePayroll()">Calculer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.dashboard-container {
+    padding: 20px;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.dashboard-header h1 {
+    color: #333;
+    margin: 0;
+}
+
+.filters {
+    display: flex;
+    gap: 10px;
+}
+
+.kpi-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.kpi-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s;
+}
+
+.kpi-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.kpi-card.present { border-left: 4px solid #28a745; }
+.kpi-card.hours { border-left: 4px solid #17a2b8; }
+.kpi-card.costs { border-left: 4px solid #ffc107; }
+.kpi-card.alerts { border-left: 4px solid #dc3545; }
+
+.kpi-icon {
+    font-size: 2.5rem;
+    margin-right: 20px;
+    opacity: 0.8;
+}
+
+.kpi-card.present .kpi-icon { color: #28a745; }
+.kpi-card.hours .kpi-icon { color: #17a2b8; }
+.kpi-card.costs .kpi-icon { color: #ffc107; }
+.kpi-card.alerts .kpi-icon { color: #dc3545; }
+
+.kpi-content h3 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.kpi-content p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.kpi-detail {
+    font-size: 0.9rem;
+    color: #999;
+}
+
+.charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.chart-container {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.chart-container h2 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.data-tables {
+    display: grid;
+    gap: 20px;
+}
+
+.table-section {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.table-section h2 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.quick-actions {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+#compliance-alerts .alert {
+    margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+    .charts-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .kpi-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .dashboard-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Variables globales pour les graphiques
+let attendanceChart = null;
+let departmentChart = null;
+
+// Initialisation au chargement
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCharts();
+    loadDashboardData();
+    setInterval(loadDashboardData, 60000); // Refresh toutes les minutes
+});
+
+function initializeCharts() {
+    // Graphique des présences
+    const attendanceCtx = document.getElementById('attendance-chart').getContext('2d');
+    attendanceChart = new Chart(attendanceCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Présents',
+                data: [],
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                tension: 0.1
+            }, {
+                label: 'Absents',
+                data: [],
+                borderColor: '#dc3545',
+                backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Graphique par département
+    const departmentCtx = document.getElementById('department-chart').getContext('2d');
+    departmentChart = new Chart(departmentCtx, {
+        type: 'doughnut',
+        data: {
+            labels: [],
+            datasets: [{
+                data: [],
+                backgroundColor: [
+                    '#28a745',
+                    '#17a2b8',
+                    '#ffc107',
+                    '#dc3545',
+                    '#6c757d'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+function loadDashboardData() {
+    fetch('/api/dashboard/overview')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateKPIs(data.dashboard);
+                updateCharts(data.dashboard);
+                updateTables(data.dashboard);
+                updateAlerts(data.dashboard.alerts);
+            }
+        })
+        .catch(error => console.error('Erreur chargement dashboard:', error));
+}
+
+function updateKPIs(data) {
+    document.getElementById('present-count').textContent = data.employees.present;
+    document.getElementById('present-total').textContent = `sur ${data.employees.total} employés`;
+    document.getElementById('total-hours').textContent = `${data.hours.total.toFixed(1)}h`;
+    document.getElementById('overtime-hours').textContent = `${data.hours.overtime.toFixed(1)}h supplémentaires`;
+    document.getElementById('daily-cost').textContent = `${data.costs.total.toFixed(0)} CHF`;
+    document.getElementById('pending-approvals').textContent = data.alerts.pending_approvals;
+}
+
+function refreshDashboard() {
+    loadDashboardData();
+    showNotification('Tableau de bord actualisé', 'success');
+}
+
+function generateReports() {
+    // Implémenter la génération de rapports
+    window.location.href = '/reports';
+}
+
+function showPayrollModal() {
+    $('#payrollModal').modal('show');
+}
+
+function calculatePayroll() {
+    const month = document.getElementById('payroll-month').value;
+    const employees = $('#payroll-employees').val();
+    
+    fetch('/api/payroll/calculate', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            month: month,
+            year: new Date().getFullYear(),
+            employee_ids: employees.includes('all') ? [] : employees
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            $('#payrollModal').modal('hide');
+            showNotification('Calcul de paie terminé', 'success');
+            setTimeout(() => {
+                window.location.href = '/payroll/validation';
+            }, 1500);
+        }
+    });
+}
+
+function showNotification(message, type) {
+    // Implémenter les notifications toast
+    console.log(`${type}: ${message}`);
+}
+</script>
+{% endblock %}

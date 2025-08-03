@@ -1,0 +1,373 @@
+{% extends 'base.html' %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block extra_css %}
+<link href="{{ url_for('static', filename='css/professional-style.css') }}" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    .dashboard-header {
+        background: linear-gradient(135deg, #003366 0%, #0066CC 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: 0 0 24px 24px;
+    }
+    
+    .welcome-text {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+    }
+    
+    .date-time {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .quick-actions {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+    
+    .action-button {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1.5rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: var(--gray-700);
+        background: var(--gray-50);
+        border: 2px solid transparent;
+    }
+    
+    .action-button:hover {
+        background: white;
+        border-color: var(--primary);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        color: var(--primary);
+    }
+    
+    .action-button i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .chart-container {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        height: 400px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="welcome-text fade-in">
+                    Bonjour, {{ current_user.first_name }} {{ current_user.last_name }} 👋
+                </h1>
+                <p class="date-time mb-0">
+                    <i class="bi bi-calendar3"></i> {{ moment().format('dddd D MMMM YYYY') }} | 
+                    <i class="bi bi-clock"></i> <span id="current-time">{{ moment().format('HH:mm') }}</span>
+                </p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{{ url_for('badge.index') }}" class="btn btn-light btn-lg">
+                    <i class="bi bi-qr-code-scan"></i> Interface Badge
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <!-- Statistiques principales -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4 fade-in">
+            <div class="stat-card primary">
+                <div class="stat-icon">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div class="stat-value" data-counter="{{ stats.total_clients }}">0</div>
+                <div class="stat-label">Clients actifs</div>
+                <div class="progress mt-3" style="height: 6px; background: rgba(255,255,255,0.3);">
+                    <div class="progress-bar bg-white" style="width: 75%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4 fade-in" style="animation-delay: 0.1s;">
+            <div class="stat-card success">
+                <div class="stat-icon">
+                    <i class="bi bi-building"></i>
+                </div>
+                <div class="stat-value" data-counter="{{ stats.active_projects }}">0</div>
+                <div class="stat-label">Projets en cours</div>
+                <div class="progress mt-3" style="height: 6px; background: rgba(255,255,255,0.3);">
+                    <div class="progress-bar bg-white" style="width: 60%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4 fade-in" style="animation-delay: 0.2s;">
+            <div class="stat-card warning">
+                <div class="stat-icon">
+                    <i class="bi bi-currency-euro"></i>
+                </div>
+                <div class="stat-value">CHF <span data-counter="{{ stats.total_revenue|int }}">0</span></div>
+                <div class="stat-label">Chiffre d'affaires</div>
+                <div class="progress mt-3" style="height: 6px; background: rgba(255,255,255,0.3);">
+                    <div class="progress-bar bg-white" style="width: 85%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4 fade-in" style="animation-delay: 0.3s;">
+            <div class="stat-card danger">
+                <div class="stat-icon">
+                    <i class="bi bi-person-badge"></i>
+                </div>
+                <div class="stat-value" data-counter="{{ stats.total_employees }}">0</div>
+                <div class="stat-label">Employés actifs</div>
+                <div class="progress mt-3" style="height: 6px; background: rgba(255,255,255,0.3);">
+                    <div class="progress-bar bg-white" style="width: 90%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="quick-actions fade-in" style="animation-delay: 0.4s;">
+                <h3 class="mb-4">
+                    <i class="bi bi-lightning-charge-fill text-warning"></i> Actions rapides
+                </h3>
+                <div class="row">
+                    <div class="col-md-2 col-sm-4 col-6 mb-3">
+                        <a href="{{ url_for('crm.client_new') }}" class="action-button">
+                            <i class="bi bi-person-plus-fill text-primary"></i>
+                            <span>Nouveau client</span>
+                        </a>
+                    </div>
+                    <div class="col-md-2 col-sm-4 col-6 mb-3">
+                        <a href="{{ url_for('crm.project_new') }}" class="action-button">
+                            <i class="bi bi-building-add text-success"></i>
+                            <span>Nouveau projet</span>
+                        </a>
+                    </div>
+                    <div class="col-md-2 col-sm-4 col-6 mb-3">
+                        <a href="{{ url_for('crm.quote_new') }}" class="action-button">
+                            <i class="bi bi-file-earmark-plus text-info"></i>
+                            <span>Nouveau devis</span>
+                        </a>
+                    </div>
+                    <div class="col-md-2 col-sm-4 col-6 mb-3">
+                        <a href="{{ url_for('crm.invoice_new') }}" class="action-button">
+                            <i class="bi bi-receipt-cutoff text-warning"></i>
+                            <span>Nouvelle facture</span>
+                        </a>
+                    </div>
+                    <div class="col-md-2 col-sm-4 col-6 mb-3">
+                        <a href="{{ url_for('admin.employee_new') }}" class="action-button">
+                            <i class="bi bi-person-badge-fill text-danger"></i>
+                            <span>Nouvel employé</span>
+                        </a>
+                    </div>
+                    <div class="col-md-2 col-sm-4 col-6 mb-3">
+                        <a href="{{ url_for('admin.payroll_generate') }}" class="action-button">
+                            <i class="bi bi-cash-stack text-success"></i>
+                            <span>Paie mensuelle</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques et tableaux -->
+    <div class="row">
+        <!-- Graphique des revenus -->
+        <div class="col-lg-8 mb-4">
+            <div class="chart-container fade-in" style="animation-delay: 0.5s;">
+                <h4 class="mb-4">
+                    <i class="bi bi-graph-up text-success"></i> Évolution du chiffre d'affaires
+                </h4>
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Projets récents -->
+        <div class="col-lg-4 mb-4">
+            <div class="card fade-in" style="animation-delay: 0.6s;">
+                <div class="card-header">
+                    <i class="bi bi-clock-history"></i> Projets récents
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for project in recent_projects[:5] %}
+                        <a href="{{ url_for('crm.project_detail', id=project.id) }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ project.name }}</h6>
+                                <small class="text-muted">{{ project.status }}</small>
+                            </div>
+                            <p class="mb-1 text-muted">{{ project.client.company_name or (project.client.first_name + ' ' + project.client.last_name) }}</p>
+                            <div class="progress" style="height: 4px;">
+                                <div class="progress-bar bg-primary" style="width: {{ project.completion_percentage }}%"></div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tâches et rappels -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card fade-in" style="animation-delay: 0.7s;">
+                <div class="card-header">
+                    <i class="bi bi-list-task"></i> Tâches du jour
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Tâche</th>
+                                    <th>Projet</th>
+                                    <th>Priorité</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task in today_tasks[:5] %}
+                                <tr>
+                                    <td>{{ task.title }}</td>
+                                    <td>{{ task.project.name }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'danger' if task.priority == 'high' else 'warning' if task.priority == 'medium' else 'info' }}">
+                                            {{ task.priority }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('crm.project_detail', id=task.project_id) }}" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 mb-4">
+            <div class="card fade-in" style="animation-delay: 0.8s;">
+                <div class="card-header">
+                    <i class="bi bi-bell"></i> Rappels et notifications
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for reminder in upcoming_reminders[:5] %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ reminder.title }}</h6>
+                                <small class="text-muted">{{ reminder.reminder_date.strftime('%d/%m %H:%M') }}</small>
+                            </div>
+                            <p class="mb-1 text-muted">{{ reminder.message }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Animation des compteurs
+document.addEventListener('DOMContentLoaded', function() {
+    const counters = document.querySelectorAll('[data-counter]');
+    
+    counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-counter'));
+        const duration = 2000;
+        const increment = target / (duration / 16);
+        let current = 0;
+        
+        const updateCounter = () => {
+            current += increment;
+            if (current < target) {
+                counter.textContent = Math.floor(current).toLocaleString('fr-CH');
+                requestAnimationFrame(updateCounter);
+            } else {
+                counter.textContent = target.toLocaleString('fr-CH');
+            }
+        };
+        
+        updateCounter();
+    });
+    
+    // Mise à jour de l'heure
+    setInterval(() => {
+        document.getElementById('current-time').textContent = new Date().toLocaleTimeString('fr-CH', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }, 1000);
+    
+    // Graphique des revenus
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'],
+            datasets: [{
+                label: 'Chiffre d\'affaires',
+                data: [45000, 52000, 48000, 61000, 58000, 65000, 72000, 69000, 75000, 82000, 78000, 85000],
+                borderColor: '#003366',
+                backgroundColor: 'rgba(0, 51, 102, 0.1)',
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'CHF ' + value.toLocaleString('fr-CH');
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -256,9 +256,12 @@ class Expense(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     expense_number = db.Column(db.String(20), unique=True)
     
+    # Employé concerné
+    employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False)
+    
     # Type et catégorie
     expense_type = db.Column(db.String(50))  # Matériaux, Transport, Sous-traitance, etc.
-    category = db.Column(db.String(50))
+    category = db.Column(db.String(50))  # Transport, Repas, Fournitures, Hébergement, etc.
     
     # Projet associé
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
@@ -275,27 +278,53 @@ class Expense(db.Model):
     amount = db.Column(db.Decimal(10, 2), nullable=False)
     tax_amount = db.Column(db.Decimal(10, 2), default=0)
     total_amount = db.Column(db.Decimal(10, 2), nullable=False)
+    currency = db.Column(db.String(3), default='CHF')
+    exchange_rate = db.Column(db.Float, default=1.0)  # Si devise étrangère
     
     # Paiement
-    payment_method = db.Column(db.String(50))  # Carte, Virement, Espèces
-    payment_status = db.Column(db.String(20), default='pending')  # pending, paid, reimbursed
+    payment_method = db.Column(db.String(50))  # Carte entreprise, Personnel, Espèces
+    payment_status = db.Column(db.String(20), default='pending')  # pending, approved, rejected, paid, reimbursed
     paid_date = db.Column(db.Date)
+    reimbursed_date = db.Column(db.Date)
+    reimbursement_amount = db.Column(db.Decimal(10, 2))
     
     # Documents
     receipt_path = db.Column(db.String(200))
+    receipt_photo = db.Column(db.String(200))  # Photo du reçu
     invoice_reference = db.Column(db.String(100))
     
-    # Validation
+    # Workflow de validation
     submitted_by_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    approved_by_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    approved_at = db.Column(db.DateTime)
+    submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Approbation niveau 1 (Manager)
+    manager_approved_by_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    manager_approved_at = db.Column(db.DateTime)
+    manager_comments = db.Column(db.Text)
+    
+    # Approbation niveau 2 (Finance/RH)
+    final_approved_by_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    final_approved_at = db.Column(db.DateTime)
+    final_comments = db.Column(db.Text)
+    
+    # Raison de rejet
+    rejection_reason = db.Column(db.Text)
+    rejected_by_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    rejected_at = db.Column(db.DateTime)
+    
+    # Politiques
+    policy_violation = db.Column(db.Boolean, default=False)
+    policy_violation_reason = db.Column(db.Text)
     
     # Notes
     notes = db.Column(db.Text)
     
     # Relations
+    employee = db.relationship('Employee', backref='expenses')
     submitted_by = db.relationship('User', foreign_keys=[submitted_by_id])
-    approved_by = db.relationship('User', foreign_keys=[approved_by_id])
+    manager_approved_by = db.relationship('User', foreign_keys=[manager_approved_by_id])
+    final_approved_by = db.relationship('User', foreign_keys=[final_approved_by_id])
+    rejected_by = db.relationship('User', foreign_keys=[rejected_by_id])
     
     def __repr__(self):
         return f'<Expense {self.expense_number or self.id}>'

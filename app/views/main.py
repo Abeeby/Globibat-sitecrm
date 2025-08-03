@@ -10,53 +10,10 @@ from sqlalchemy import func
 
 bp = Blueprint('main', __name__)
 
-@bp.route('/')
-def index():
-    """Page d'accueil publique - Optimisée SEO pour construction Suisse romande"""
-    # Si l'utilisateur est connecté, rediriger vers le dashboard
-    if current_user.is_authenticated:
-        return redirect(url_for('main.dashboard'))
-    
-    # Données SEO pour le secteur construction en Suisse romande
-    seo_data = {
-        'title': 'Globibat - Entreprise de Construction en Suisse Romande | Genève, Lausanne, Fribourg',
-        'description': 'Globibat, votre partenaire de confiance pour tous vos projets de construction en Suisse romande. Spécialistes en construction neuve, rénovation et transformation.',
-        'keywords': 'construction suisse romande, entreprise batiment geneve, renovation lausanne, construction neuve fribourg, entrepreneur general suisse',
-        'services': [
-            {
-                'title': 'Construction Neuve',
-                'description': 'Réalisation de villas, immeubles résidentiels et bâtiments commerciaux',
-                'icon': 'building'
-            },
-            {
-                'title': 'Rénovation',
-                'description': 'Transformation et rénovation complète de bâtiments existants',
-                'icon': 'tools'
-            },
-            {
-                'title': 'Gros Œuvre',
-                'description': 'Maçonnerie, béton armé, terrassement et fondations',
-                'icon': 'foundation'
-            },
-            {
-                'title': 'Second Œuvre',
-                'description': 'Finitions, aménagements intérieurs et façades',
-                'icon': 'paint-brush'
-            }
-        ],
-        'regions': ['Genève', 'Lausanne', 'Fribourg', 'Neuchâtel', 'Sion', 'Yverdon'],
-        'certifications': ['ISO 9001', 'Eco-bau', 'SQS', 'Minergie'],
-        'stats': {
-            'projects_completed': 150,
-            'years_experience': 25,
-            'satisfied_clients': 200,
-            'employees': 50
-        }
-    }
-    
-    return render_template('index.html', seo_data=seo_data)
+# La route '/' est maintenant gérée par website_bp dans website.py
+# pour séparer complètement le site public du système interne CRM
 
-@bp.route('/dashboard')
+@bp.route('/crm/dashboard')
 @login_required
 def dashboard():
     """Tableau de bord principal"""

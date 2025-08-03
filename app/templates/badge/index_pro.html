@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Système de Badge - Globibat SA</title>
+    
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #003366;
+            --primary-light: #0066CC;
+            --secondary: #FF6B35;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --gradient-primary: linear-gradient(135deg, #003366 0%, #0066CC 100%);
+            --gradient-secondary: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            overflow: hidden;
+        }
+        
+        /* Animated background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(255, 107, 53, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 102, 204, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            animation: backgroundMove 20s ease-in-out infinite;
+        }
+        
+        @keyframes backgroundMove {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-20px, -20px) scale(1.1); }
+            66% { transform: translate(20px, -20px) scale(0.9); }
+        }
+        
+        .badge-container {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 3rem;
+            box-shadow: 
+                0 30px 60px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            animation: containerFadeIn 0.8s ease-out;
+        }
+        
+        @keyframes containerFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logo {
+            width: 180px;
+            margin-bottom: 2rem;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+        
+        .clock-display {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 51, 102, 0.3);
+        }
+        
+        .time {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+            margin: 0;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .date {
+            font-size: 1.2rem;
+            font-weight: 500;
+            opacity: 0.9;
+            margin: 0;
+        }
+        
+        .badge-form {
+            margin-top: 2rem;
+        }
+        
+        .badge-input {
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            padding: 1.5rem;
+            border: 3px solid #e0e0e0;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            letter-spacing: 2px;
+        }
+        
+        .badge-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(0, 51, 102, 0.25);
+            transform: scale(1.02);
+            background: white;
+        }
+        
+        .badge-button {
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding: 1.5rem 4rem;
+            border-radius: 50px;
+            background: var(--gradient-secondary);
+            color: white;
+            border: none;
+            box-shadow: 
+                0 15px 35px rgba(255, 107, 53, 0.3),
+                0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .badge-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .badge-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 
+                0 20px 40px rgba(255, 107, 53, 0.4),
+                0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .badge-button:active::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .status-message {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: none;
+            animation: statusFadeIn 0.5s ease-out;
+        }
+        
+        @keyframes statusFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .status-success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+        
+        .status-error {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+        
+        .employee-info {
+            display: none;
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 15px;
+            text-align: left;
+        }
+        
+        .employee-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .employee-details {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+        
+        .badge-icon {
+            font-size: 5rem;
+            margin: 2rem 0;
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+        
+        .check-in { color: var(--success); }
+        .check-out { color: var(--danger); }
+        
+        /* Instructions */
+        .instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Loading animation */
+        .loading {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .badge-container {
+                padding: 2rem 1.5rem;
+            }
+            
+            .time {
+                font-size: 2.5rem;
+            }
+            
+            .badge-button {
+                padding: 1.2rem 3rem;
+                font-size: 1.2rem;
+            }
+            
+            .badge-input {
+                font-size: 1.5rem;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="badge-container">
+        <!-- Logo -->
+        <img src="{{ url_for('static', filename='icons/badge.png') }}" alt="Globibat" class="logo">
+        
+        <!-- Horloge -->
+        <div class="clock-display">
+            <h1 class="time" id="time">00:00:00</h1>
+            <p class="date" id="date">Chargement...</p>
+        </div>
+        
+        <!-- Icône animée -->
+        <div class="badge-icon">
+            <i class="bi bi-person-badge-fill"></i>
+        </div>
+        
+        <!-- Formulaire -->
+        <form class="badge-form" id="badgeForm">
+            <input type="text" 
+                   class="form-control badge-input" 
+                   id="badgeNumber" 
+                   placeholder="NUMÉRO DE BADGE"
+                   maxlength="10"
+                   autocomplete="off"
+                   required>
+            
+            <button type="submit" class="badge-button">
+                <i class="bi bi-check-circle-fill"></i> VALIDER
+            </button>
+        </form>
+        
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+        </div>
+        
+        <!-- Message de statut -->
+        <div class="status-message" id="statusMessage"></div>
+        
+        <!-- Informations employé -->
+        <div class="employee-info" id="employeeInfo">
+            <div class="employee-name" id="employeeName"></div>
+            <div class="employee-details" id="employeeDetails"></div>
+        </div>
+    </div>
+    
+    <div class="instructions">
+        <p><i class="bi bi-info-circle"></i> Scannez votre badge ou entrez votre numéro</p>
+    </div>
+
+    <script>
+        // Mise à jour de l'horloge
+        function updateClock() {
+            const now = new Date();
+            
+            // Heure
+            const time = now.toLocaleTimeString('fr-CH', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('time').textContent = time;
+            
+            // Date
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            const date = now.toLocaleDateString('fr-CH', options);
+            document.getElementById('date').textContent = 
+                date.charAt(0).toUpperCase() + date.slice(1);
+        }
+        
+        // Mise à jour initiale et toutes les secondes
+        updateClock();
+        setInterval(updateClock, 1000);
+        
+        // Gestion du formulaire
+        document.getElementById('badgeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const badgeNumber = document.getElementById('badgeNumber').value;
+            const loading = document.getElementById('loading');
+            const statusMessage = document.getElementById('statusMessage');
+            const employeeInfo = document.getElementById('employeeInfo');
+            const badgeIcon = document.querySelector('.badge-icon i');
+            
+            // Reset
+            statusMessage.style.display = 'none';
+            employeeInfo.style.display = 'none';
+            loading.style.display = 'block';
+            
+            try {
+                // Appel API
+                const response = await fetch('/badge/check', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ badge_number: badgeNumber })
+                });
+                
+                const data = await response.json();
+                loading.style.display = 'none';
+                
+                if (data.success) {
+                    // Succès
+                    statusMessage.className = 'status-message status-success';
+                    statusMessage.innerHTML = `
+                        <i class="bi bi-check-circle-fill"></i> ${data.message}
+                    `;
+                    statusMessage.style.display = 'block';
+                    
+                    // Afficher info employé
+                    if (data.employee) {
+                        document.getElementById('employeeName').textContent = data.employee.name;
+                        document.getElementById('employeeDetails').innerHTML = `
+                            <i class="bi bi-briefcase"></i> ${data.employee.position || 'Employé'}<br>
+                            <i class="bi bi-clock"></i> ${data.action_type === 'check_in' ? 'Entrée' : 'Sortie'} enregistrée
+                        `;
+                        employeeInfo.style.display = 'block';
+                    }
+                    
+                    // Changer l'icône
+                    badgeIcon.className = data.action_type === 'check_in' ? 
+                        'bi bi-box-arrow-in-right check-in' : 
+                        'bi bi-box-arrow-out-right check-out';
+                    
+                    // Réinitialiser après 5 secondes
+                    setTimeout(() => {
+                        document.getElementById('badgeNumber').value = '';
+                        statusMessage.style.display = 'none';
+                        employeeInfo.style.display = 'none';
+                        badgeIcon.className = 'bi bi-person-badge-fill';
+                    }, 5000);
+                    
+                } else {
+                    // Erreur
+                    statusMessage.className = 'status-message status-error';
+                    statusMessage.innerHTML = `
+                        <i class="bi bi-x-circle-fill"></i> ${data.message}
+                    `;
+                    statusMessage.style.display = 'block';
+                    
+                    // Animation d'erreur
+                    document.querySelector('.badge-container').style.animation = 
+                        'shake 0.5s ease-in-out';
+                    
+                    setTimeout(() => {
+                        document.querySelector('.badge-container').style.animation = '';
+                    }, 500);
+                }
+                
+            } catch (error) {
+                loading.style.display = 'none';
+                statusMessage.className = 'status-message status-error';
+                statusMessage.innerHTML = `
+                    <i class="bi bi-wifi-off"></i> Erreur de connexion
+                `;
+                statusMessage.style.display = 'block';
+            }
+            
+            // Focus sur l'input
+            document.getElementById('badgeNumber').focus();
+            document.getElementById('badgeNumber').select();
+        });
+        
+        // Animation shake pour erreur
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Auto-focus sur l'input
+        document.getElementById('badgeNumber').focus();
+    </script>
+</body>
+</html>

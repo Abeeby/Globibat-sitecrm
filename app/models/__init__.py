@@ -8,6 +8,8 @@ from .project import Project, ProjectPhase, ProjectTask, ProjectDocument
 from .finance import Invoice, Quote, Expense, Payment
 from .inventory import Material, Equipment, Supplier, PurchaseOrder
 from .planning import Schedule, Meeting, Reminder
+from .analytics import (ExpensePolicy, WorkTimeRegulation, EmployeeStatistics, 
+                       CompanyDashboard, AuditLog, Notification)
 
 __all__ = [
     'User', 'Role',
@@ -16,5 +18,7 @@ __all__ = [
     'Project', 'ProjectPhase', 'ProjectTask', 'ProjectDocument',
     'Invoice', 'Quote', 'Expense', 'Payment',
     'Material', 'Equipment', 'Supplier', 'PurchaseOrder',
-    'Schedule', 'Meeting', 'Reminder'
+    'Schedule', 'Meeting', 'Reminder',
+    'ExpensePolicy', 'WorkTimeRegulation', 'EmployeeStatistics',
+    'CompanyDashboard', 'AuditLog', 'Notification'
 ]

@@ -44,6 +44,12 @@ class Employee(db.Model):
     city = db.Column(db.String(100))
     canton = db.Column(db.String(50))
     
+    # Badge et authentification
+    badge_number = db.Column(db.String(20), unique=True)
+    qr_code = db.Column(db.String(100), unique=True)
+    pin_code = db.Column(db.String(6))  # Code PIN à 6 chiffres
+    face_data = db.Column(db.JSON)  # Données biométriques (future feature)
+    
     # Statut
     is_active = db.Column(db.Boolean, default=True)
     
@@ -101,6 +107,19 @@ class Attendance(db.Model):
     
     # Projet associé (pour facturation)
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
+    
+    # Géolocalisation
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+    location_name = db.Column(db.String(200))  # Ex: "Chantier Rue de la Gare"
+    
+    # Photos anti-fraude
+    check_in_photo = db.Column(db.String(200))  # Chemin vers la photo
+    check_out_photo = db.Column(db.String(200))
+    
+    # Méthode de pointage
+    check_method = db.Column(db.String(20))  # badge, qr_code, pin, face
+    device_info = db.Column(db.String(200))  # Info sur l'appareil utilisé
     
     # Notes
     notes = db.Column(db.Text)

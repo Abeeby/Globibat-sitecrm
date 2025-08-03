@@ -1,0 +1,39 @@
+COMMANDES À COPIER-COLLER DANS VOTRE TERMINAL SSH
+=================================================
+
+Copiez et collez ces commandes une par une dans votre terminal SSH :
+
+1) D'abord, allez dans le bon dossier :
+cd /var/www/globibat
+
+2) Arrêtez l'application actuelle :
+pkill -f 'python.*run.py'
+
+3) Créez le fichier .env (copiez tout le bloc) :
+cat > .env << 'EOF'
+SECRET_KEY=globibat-secret-key-2025-production-secure
+FLASK_ENV=production
+DATABASE_URL=mysql+pymysql://globibat_user:Miser1597532684$@localhost/globibat_crm
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=True
+MAIL_USERNAME=info@globibat.com
+MAIL_PASSWORD=Miser1597532684$
+EOF
+
+4) Exportez la clé secrète :
+export SECRET_KEY="globibat-secret-key-2025-production-secure"
+
+5) Activez l'environnement virtuel :
+source venv/bin/activate
+
+6) Redémarrez l'application :
+python run.py
+
+C'EST TOUT ! 
+L'application devrait maintenant fonctionner sans erreur CSRF.
+
+URLs pour tester :
+- Site public: http://148.230.105.25:5000/
+- CRM: http://148.230.105.25:5000/auth/login
+- Badge: http://148.230.105.25:5000/employee/badge

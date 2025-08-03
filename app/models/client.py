@@ -70,6 +70,9 @@ class Client(db.Model):
     # Notes et documents
     internal_notes = db.Column(db.Text)
     
+    # Statut
+    is_active = db.Column(db.Boolean, default=True)
+    
     # Relations
     assigned_to = db.relationship('User', foreign_keys=[assigned_to_id])
     contacts = db.relationship('Contact', backref='client', lazy='dynamic', cascade='all, delete-orphan')

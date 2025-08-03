@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Globibat SA - Entreprise Générale de Construction | Nyon, Suisse Romande</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Globibat SA - Votre entreprise générale de construction à Nyon. Spécialistes en rénovation, construction neuve et maçonnerie en Suisse romande. Plus de 15 ans d'expérience. Devis gratuit.">
+    <meta name="keywords" content="construction suisse romande, entreprise construction nyon, rénovation nyon, maçonnerie suisse romande, entreprise générale bâtiment, construction vaud, globibat, bâtiment nyon">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Globibat SA">
+    <link rel="canonical" href="https://www.globibat.com/">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Globibat SA | Construction & Rénovation en Suisse Romande">
+    <meta property="og:description" content="Entreprise générale de construction à Nyon. Experts en rénovation et construction neuve depuis plus de 15 ans.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.globibat.com/">
+    <meta property="og:image" content="https://www.globibat.com/images/globibat-og.jpg">
+    <meta property="og:locale" content="fr_CH">
+    
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #1a237e;
+            --secondary: #ff6f00;
+            --accent: #00bcd4;
+            --dark: #212121;
+            --light: #f5f5f5;
+            --gradient: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        /* Navigation */
+        .navbar {
+            background: rgba(26, 35, 126, 0.95);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            padding: 1rem 0;
+        }
+        
+        .navbar.scrolled {
+            padding: 0.5rem 0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.8rem;
+            color: white !important;
+        }
+        
+        .navbar-nav .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
+            margin: 0 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .navbar-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary);
+            transition: width 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            background: var(--gradient);
+            position: relative;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h100v100H0z' fill='%23ffffff' fill-opacity='0.03'/%3E%3Cpath d='M0 0l50 50-50 50M50 0l50 50-50 50' stroke='%23ffffff' stroke-opacity='0.05' fill='none'/%3E%3C/svg%3E");
+            animation: backgroundMove 20s linear infinite;
+        }
+        
+        @keyframes backgroundMove {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(100px); }
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            color: white;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .btn-hero {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            margin-right: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-primary-custom {
+            background: var(--secondary);
+            color: white;
+            box-shadow: 0 5px 20px rgba(255, 111, 0, 0.3);
+        }
+        
+        .btn-primary-custom:hover {
+            background: #e65100;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(255, 111, 0, 0.4);
+        }
+        
+        .btn-outline-custom {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .btn-outline-custom:hover {
+            background: white;
+            color: var(--primary);
+        }
+        
+        /* Services */
+        .services {
+            padding: 100px 0;
+            background: #f8f9fa;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .service-card {
+            background: white;
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            text-align: center;
+            height: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.08);
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        .service-icon {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+        
+        .service-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+        
+        /* About */
+        .about {
+            padding: 100px 0;
+        }
+        
+        .about-content {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+        }
+        
+        .about-text h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+        }
+        
+        .about-text p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+        
+        .about-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .stat-box {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Projects */
+        .projects {
+            padding: 100px 0;
+            background: #f8f9fa;
+        }
+        
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        
+        .project-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            height: 400px;
+            cursor: pointer;
+        }
+        
+        .project-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .project-card:hover img {
+            transform: scale(1.1);
+        }
+        
+        .project-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 2rem;
+            color: white;
+        }
+        
+        .project-overlay h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* CTA */
+        .cta {
+            background: var(--gradient);
+            padding: 80px 0;
+            text-align: center;
+            color: white;
+        }
+        
+        .cta h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+        
+        /* Contact */
+        .contact {
+            padding: 100px 0;
+        }
+        
+        .contact-info {
+            background: #f8f9fa;
+            padding: 3rem;
+            border-radius: 20px;
+            height: 100%;
+        }
+        
+        .contact-form {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .form-control {
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: none;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 50px 0 30px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-section h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-section a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-section a:hover {
+            color: var(--secondary);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .about-content {
+                flex-direction: column;
+            }
+            
+            .navbar-nav {
+                text-align: center;
+            }
+            
+            .navbar-nav .nav-link {
+                margin: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="bi bi-building"></i> GLOBIBAT</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#accueil">Accueil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#apropos">À Propos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#projets">Projets</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="accueil">
+        <div class="container">
+            <div class="hero-content" data-aos="fade-up">
+                <h1>Construisons l'Avenir<br>de la Suisse Romande</h1>
+                <p>Votre partenaire de confiance pour tous vos projets de construction et rénovation à Nyon et dans toute la région.</p>
+                <a href="#contact" class="btn-hero btn-primary-custom">Demander un Devis</a>
+                <a href="tel:+41223611112" class="btn-hero btn-outline-custom"><i class="bi bi-telephone"></i> +41 22 361 11 12</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services -->
+    <section class="services" id="services">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Nos Services</h2>
+            <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">Excellence et professionnalisme dans chaque projet</p>
+            
+            <div class="row g-4">
+                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="bi bi-house-door-fill"></i>
+                        </div>
+                        <h3>Construction Neuve</h3>
+                        <p>De la conception à la remise des clés, nous réalisons vos projets de construction avec expertise et passion.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="bi bi-tools"></i>
+                        </div>
+                        <h3>Rénovation Complète</h3>
+                        <p>Transformez vos espaces avec nos solutions de rénovation innovantes et durables, adaptées à vos besoins.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="400">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="bi bi-bricks"></i>
+                        </div>
+                        <h3>Maçonnerie & Gros Œuvre</h3>
+                        <p>Expertise en travaux de maçonnerie et gros œuvre, réalisés par des professionnels qualifiés et expérimentés.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About -->
+    <section class="about" id="apropos">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text" data-aos="fade-right">
+                    <h2>Plus de 15 Ans d'Excellence</h2>
+                    <p>Depuis sa création, Globibat SA s'est imposée comme une référence dans le domaine de la construction en Suisse romande. Notre équipe de professionnels passionnés met tout en œuvre pour concrétiser vos projets les plus ambitieux.</p>
+                    <p>Basés à Nyon, nous intervenons dans tout le canton de Vaud et les régions avoisinantes, apportant notre expertise et notre savoir-faire sur chaque chantier.</p>
+                    
+                    <div class="about-stats">
+                        <div class="stat-box">
+                            <div class="stat-number" data-count="250">0</div>
+                            <div class="stat-label">Projets Réalisés</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number" data-count="45">0</div>
+                            <div class="stat-label">Employés Qualifiés</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number" data-count="98">0</div>
+                            <div class="stat-label">% Satisfaction</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number" data-count="15">0</div>
+                            <div class="stat-label">Années d'Expérience</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="about-image" data-aos="fade-left">
+                    <img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600" alt="Construction site" class="img-fluid rounded-4 shadow">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects -->
+    <section class="projects" id="projets">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Nos Réalisations</h2>
+            <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">Découvrez quelques-uns de nos projets récents</p>
+            
+            <div class="project-grid">
+                <div class="project-card" data-aos="zoom-in" data-aos-delay="200">
+                    <img src="https://images.unsplash.com/photo-1523413363574-c30aa1c2a516?w=600" alt="Villa moderne">
+                    <div class="project-overlay">
+                        <h3>Villa Moderne à Coppet</h3>
+                        <p>Construction neuve - 350m²</p>
+                    </div>
+                </div>
+                
+                <div class="project-card" data-aos="zoom-in" data-aos-delay="300">
+                    <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600" alt="Appartements">
+                    <div class="project-overlay">
+                        <h3>Résidence Les Terrasses</h3>
+                        <p>Immeuble de 12 appartements - Nyon</p>
+                    </div>
+                </div>
+                
+                <div class="project-card" data-aos="zoom-in" data-aos-delay="400">
+                    <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600" alt="Rénovation">
+                    <div class="project-overlay">
+                        <h3>Rénovation Centre-Ville</h3>
+                        <p>Transformation complète - Genève</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+        <div class="container">
+            <h2 data-aos="fade-up">Prêt à Concrétiser Votre Projet ?</h2>
+            <p class="lead mb-4" data-aos="fade-up" data-aos-delay="100">Contactez-nous dès aujourd'hui pour un devis gratuit et sans engagement</p>
+            <div data-aos="fade-up" data-aos-delay="200">
+                <a href="#contact" class="btn-hero btn-primary-custom">Demander un Devis</a>
+                <a href="tel:+41223611112" class="btn-hero btn-outline-custom"><i class="bi bi-telephone"></i> Appeler Maintenant</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Contactez-Nous</h2>
+            <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">Nous sommes à votre écoute pour tous vos projets</p>
+            
+            <div class="row g-4">
+                <div class="col-lg-5" data-aos="fade-right">
+                    <div class="contact-info">
+                        <h3 class="mb-4">Nos Coordonnées</h3>
+                        
+                        <div class="d-flex mb-3">
+                            <i class="bi bi-geo-alt-fill fs-4 text-primary me-3"></i>
+                            <div>
+                                <h5>Adresse</h5>
+                                <p>Chemin du Bochet 8<br>1260 Nyon, Suisse</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex mb-3">
+                            <i class="bi bi-telephone-fill fs-4 text-primary me-3"></i>
+                            <div>
+                                <h5>Téléphone</h5>
+                                <p><a href="tel:+41223611112">+41 22 361 11 12</a></p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex mb-3">
+                            <i class="bi bi-envelope-fill fs-4 text-primary me-3"></i>
+                            <div>
+                                <h5>Email</h5>
+                                <p><a href="mailto:info@globibat.com">info@globibat.com</a></p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex mb-3">
+                            <i class="bi bi-clock-fill fs-4 text-primary me-3"></i>
+                            <div>
+                                <h5>Horaires</h5>
+                                <p>Lun-Ven: 7h00 - 18h00<br>Sam: 8h00 - 12h00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-7" data-aos="fade-left">
+                    <form class="contact-form" action="/contact" method="POST">
+                        <h3 class="mb-4">Demande de Devis</h3>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <input type="text" name="name" class="form-control" placeholder="Nom complet" required>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="email" name="email" class="form-control" placeholder="Email" required>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="tel" name="phone" class="form-control" placeholder="Téléphone">
+                            </div>
+                            <div class="col-md-6">
+                                <select name="project_type" class="form-control">
+                                    <option>Type de projet</option>
+                                    <option>Construction neuve</option>
+                                    <option>Rénovation</option>
+                                    <option>Extension</option>
+                                    <option>Maçonnerie</option>
+                                    <option>Autre</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <textarea name="message" class="form-control" rows="5" placeholder="Décrivez votre projet en détail..." required></textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary btn-lg w-100" style="background: var(--secondary); border: none;">
+                                    <i class="bi bi-send"></i> Envoyer la Demande
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4><i class="bi bi-building"></i> GLOBIBAT SA</h4>
+                    <p>Votre partenaire de confiance pour tous vos projets de construction en Suisse romande.</p>
+                    <div class="social-links mt-3">
+                        <a href="#" class="me-3"><i class="bi bi-facebook fs-5"></i></a>
+                        <a href="#" class="me-3"><i class="bi bi-instagram fs-5"></i></a>
+                        <a href="#" class="me-3"><i class="bi bi-linkedin fs-5"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Services</h4>
+                    <ul>
+                        <li><a href="#services">Construction neuve</a></li>
+                        <li><a href="#services">Rénovation</a></li>
+                        <li><a href="#services">Maçonnerie</a></li>
+                        <li><a href="#services">Gros œuvre</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Informations</h4>
+                    <ul>
+                        <li><a href="#apropos">À propos</a></li>
+                        <li><a href="#projets">Nos projets</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="/mentions-legales">Mentions légales</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Zone d'Intervention</h4>
+                    <ul>
+                        <li>Nyon et environs</li>
+                        <li>Canton de Vaud</li>
+                        <li>Canton de Genève</li>
+                        <li>Suisse romande</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Globibat SA - Tous droits réservés | Entreprise de construction à Nyon</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 1000,
+            once: true
+        });
+        
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+        
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Counter animation
+        const counters = document.querySelectorAll('[data-count]');
+        let animated = false;
+        
+        function animateCounters() {
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-count'));
+                const duration = 2000;
+                const increment = target / (duration / 16);
+                let current = 0;
+                
+                const updateCounter = () => {
+                    current += increment;
+                    if (current < target) {
+                        counter.textContent = Math.floor(current);
+                        requestAnimationFrame(updateCounter);
+                    } else {
+                        counter.textContent = target;
+                    }
+                };
+                
+                updateCounter();
+            });
+        }
+        
+        // Trigger counter animation when in viewport
+        const aboutSection = document.querySelector('.about');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !animated) {
+                    animated = true;
+                    animateCounters();
+                }
+            });
+        });
+        
+        if (aboutSection) {
+            observer.observe(aboutSection);
+        }
+    </script>
+    
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "GeneralContractor",
+        "name": "Globibat SA",
+        "description": "Entreprise générale de construction à Nyon, spécialisée en rénovation et construction neuve en Suisse romande",
+        "url": "https://www.globibat.com",
+        "telephone": "+41223611112",
+        "email": "info@globibat.com",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Chemin du Bochet 8",
+            "addressLocality": "Nyon",
+            "postalCode": "1260",
+            "addressCountry": "CH"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 46.3833,
+            "longitude": 6.2348
+        },
+        "areaServed": [
+            {
+                "@type": "Place",
+                "name": "Nyon"
+            },
+            {
+                "@type": "Place", 
+                "name": "Canton de Vaud"
+            },
+            {
+                "@type": "Place",
+                "name": "Suisse romande"
+            }
+        ],
+        "openingHoursSpecification": [
+            {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                "opens": "07:00",
+                "closes": "18:00"
+            },
+            {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": "Saturday",
+                "opens": "08:00",
+                "closes": "12:00"
+            }
+        ]
+    }
+    </script>
+</body>
+</html>

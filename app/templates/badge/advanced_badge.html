@@ -1,0 +1,628 @@
+{% extends "base.html" %}
+
+{% block title %}Système de Badgage - Globibat{% endblock %}
+
+{% block content %}
+<div class="badge-container">
+    <div class="badge-header">
+        <h1>Système de Badgage Avancé</h1>
+        <div class="datetime">
+            <span id="current-date"></span>
+            <span id="current-time"></span>
+        </div>
+    </div>
+
+    <!-- Stats temps réel -->
+    <div class="realtime-stats">
+        <div class="stat-card">
+            <span class="stat-number" id="present-count">0</span>
+            <span class="stat-label">Présents</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number" id="absent-count">0</span>
+            <span class="stat-label">Absents</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number" id="late-count">0</span>
+            <span class="stat-label">En retard</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number" id="leave-count">0</span>
+            <span class="stat-label">En congé</span>
+        </div>
+    </div>
+
+    <!-- Zone de badgage -->
+    <div class="badge-zone">
+        <div class="badge-methods">
+            <!-- Méthode Badge -->
+            <div class="badge-method active" data-method="badge">
+                <i class="fas fa-id-card"></i>
+                <span>Badge</span>
+            </div>
+            
+            <!-- Méthode QR Code -->
+            <div class="badge-method" data-method="qr_code">
+                <i class="fas fa-qrcode"></i>
+                <span>QR Code</span>
+            </div>
+            
+            <!-- Méthode PIN -->
+            <div class="badge-method" data-method="pin">
+                <i class="fas fa-keyboard"></i>
+                <span>Code PIN</span>
+            </div>
+            
+            <!-- Méthode Photo (futur) -->
+            <div class="badge-method disabled" data-method="face">
+                <i class="fas fa-camera"></i>
+                <span>Photo</span>
+            </div>
+        </div>
+
+        <!-- Zone d'input selon la méthode -->
+        <div class="input-zone">
+            <!-- Input Badge -->
+            <div class="input-method" id="badge-input" style="display: block;">
+                <input type="text" class="form-control badge-scan" id="badge-number" 
+                       placeholder="Scannez votre badge" autofocus>
+                <p class="help-text">Passez votre badge devant le lecteur</p>
+            </div>
+
+            <!-- Scanner QR Code -->
+            <div class="input-method" id="qr-input" style="display: none;">
+                <div id="qr-reader"></div>
+                <button class="btn btn-secondary mt-3" onclick="startQRScanner()">
+                    <i class="fas fa-camera"></i> Démarrer le scanner
+                </button>
+                <p class="help-text">Présentez votre QR code devant la caméra</p>
+            </div>
+
+            <!-- Input PIN -->
+            <div class="input-method" id="pin-input" style="display: none;">
+                <div class="pin-pad">
+                    <input type="password" class="form-control pin-display" id="pin-code" 
+                           maxlength="6" readonly placeholder="------">
+                    <div class="pin-buttons">
+                        <button class="pin-btn" onclick="addPin('1')">1</button>
+                        <button class="pin-btn" onclick="addPin('2')">2</button>
+                        <button class="pin-btn" onclick="addPin('3')">3</button>
+                        <button class="pin-btn" onclick="addPin('4')">4</button>
+                        <button class="pin-btn" onclick="addPin('5')">5</button>
+                        <button class="pin-btn" onclick="addPin('6')">6</button>
+                        <button class="pin-btn" onclick="addPin('7')">7</button>
+                        <button class="pin-btn" onclick="addPin('8')">8</button>
+                        <button class="pin-btn" onclick="addPin('9')">9</button>
+                        <button class="pin-btn clear" onclick="clearPin()">C</button>
+                        <button class="pin-btn" onclick="addPin('0')">0</button>
+                        <button class="pin-btn ok" onclick="submitPin()">OK</button>
+                    </div>
+                </div>
+                <p class="help-text">Entrez votre code PIN à 6 chiffres</p>
+            </div>
+        </div>
+
+        <!-- Zone de confirmation avec photo -->
+        <div class="confirmation-zone" id="confirmation-zone" style="display: none;">
+            <div class="employee-info">
+                <img src="" alt="Photo" id="employee-photo" class="employee-photo">
+                <div class="employee-details">
+                    <h2 id="employee-name"></h2>
+                    <p id="employee-position"></p>
+                    <p id="employee-department"></p>
+                </div>
+            </div>
+            
+            <div class="check-status">
+                <i class="fas fa-check-circle status-icon"></i>
+                <h3 id="check-message"></h3>
+                <p id="check-time"></p>
+            </div>
+
+            <!-- Option photo anti-fraude -->
+            <div class="photo-capture" id="photo-capture" style="display: none;">
+                <video id="video" width="320" height="240" autoplay></video>
+                <canvas id="canvas" width="320" height="240" style="display: none;"></canvas>
+                <button class="btn btn-primary" onclick="capturePhoto()">
+                    <i class="fas fa-camera"></i> Capturer photo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historique des pointages récents -->
+    <div class="recent-checks">
+        <h2>Pointages récents</h2>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Heure</th>
+                        <th>Employé</th>
+                        <th>Type</th>
+                        <th>Méthode</th>
+                        <th>Lieu</th>
+                    </tr>
+                </thead>
+                <tbody id="recent-checks-table">
+                    <!-- Chargé dynamiquement -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+.badge-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.badge-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.datetime {
+    text-align: right;
+}
+
+.datetime span {
+    display: block;
+    color: #666;
+}
+
+#current-time {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.realtime-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.stat-number {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.stat-label {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+}
+
+.badge-zone {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.badge-methods {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.badge-method {
+    padding: 15px 30px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.badge-method i {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.badge-method.active {
+    border-color: #007bff;
+    background: #f0f8ff;
+    color: #007bff;
+}
+
+.badge-method.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.input-zone {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-method {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.badge-scan {
+    font-size: 1.5rem;
+    padding: 15px;
+    text-align: center;
+}
+
+.pin-pad {
+    margin: 0 auto;
+    max-width: 300px;
+}
+
+.pin-display {
+    font-size: 2rem;
+    text-align: center;
+    letter-spacing: 10px;
+    margin-bottom: 20px;
+}
+
+.pin-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.pin-btn {
+    padding: 20px;
+    font-size: 1.5rem;
+    border: 1px solid #ddd;
+    background: #f8f9fa;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.2s;
+}
+
+.pin-btn:hover {
+    background: #e9ecef;
+}
+
+.pin-btn.clear {
+    background: #ffc107;
+    color: white;
+}
+
+.pin-btn.ok {
+    background: #28a745;
+    color: white;
+}
+
+.confirmation-zone {
+    text-align: center;
+    padding: 30px;
+}
+
+.employee-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.employee-photo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.employee-details {
+    text-align: left;
+}
+
+.employee-details h2 {
+    margin: 0;
+    color: #333;
+}
+
+.employee-details p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.check-status {
+    margin: 30px 0;
+}
+
+.status-icon {
+    font-size: 4rem;
+    color: #28a745;
+    margin-bottom: 15px;
+}
+
+.recent-checks {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+    .realtime-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .badge-methods {
+        flex-wrap: wrap;
+    }
+    
+    .employee-info {
+        flex-direction: column;
+    }
+}
+</style>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+let currentMethod = 'badge';
+let qrScanner = null;
+let pinCode = '';
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', function() {
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+    loadRealtimeStats();
+    setInterval(loadRealtimeStats, 30000);
+    loadRecentChecks();
+    
+    // Événements
+    document.querySelectorAll('.badge-method').forEach(method => {
+        method.addEventListener('click', function() {
+            if (!this.classList.contains('disabled')) {
+                switchMethod(this.dataset.method);
+            }
+        });
+    });
+    
+    // Scanner de badge
+    document.getElementById('badge-number').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            submitBadge(this.value);
+        }
+    });
+    
+    // Géolocalisation
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+            window.currentPosition = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+            };
+        });
+    }
+});
+
+function updateDateTime() {
+    const now = new Date();
+    document.getElementById('current-date').textContent = now.toLocaleDateString('fr-FR', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    document.getElementById('current-time').textContent = now.toLocaleTimeString('fr-FR');
+}
+
+function loadRealtimeStats() {
+    fetch('/api/badge/attendance/today')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('present-count').textContent = data.stats.present;
+                document.getElementById('absent-count').textContent = data.stats.absent;
+                document.getElementById('late-count').textContent = data.stats.late;
+                document.getElementById('leave-count').textContent = data.absent_employees.filter(e => e.reason !== 'Non justifié').length;
+            }
+        });
+}
+
+function switchMethod(method) {
+    currentMethod = method;
+    
+    // Mettre à jour l'UI
+    document.querySelectorAll('.badge-method').forEach(m => {
+        m.classList.remove('active');
+    });
+    document.querySelector(`[data-method="${method}"]`).classList.add('active');
+    
+    // Afficher la bonne zone d'input
+    document.querySelectorAll('.input-method').forEach(input => {
+        input.style.display = 'none';
+    });
+    
+    switch(method) {
+        case 'badge':
+            document.getElementById('badge-input').style.display = 'block';
+            document.getElementById('badge-number').focus();
+            break;
+        case 'qr_code':
+            document.getElementById('qr-input').style.display = 'block';
+            break;
+        case 'pin':
+            document.getElementById('pin-input').style.display = 'block';
+            clearPin();
+            break;
+    }
+    
+    // Réinitialiser la zone de confirmation
+    document.getElementById('confirmation-zone').style.display = 'none';
+}
+
+function submitBadge(badgeNumber) {
+    if (!badgeNumber) return;
+    
+    performCheckIn('badge', badgeNumber);
+    document.getElementById('badge-number').value = '';
+}
+
+function startQRScanner() {
+    const qrReader = document.getElementById('qr-reader');
+    
+    qrScanner = new Html5Qrcode('qr-reader');
+    qrScanner.start(
+        { facingMode: "environment" },
+        {
+            fps: 10,
+            qrbox: { width: 250, height: 250 }
+        },
+        (decodedText, decodedResult) => {
+            qrScanner.stop();
+            performCheckIn('qr_code', decodedText);
+        },
+        (errorMessage) => {
+            // Erreurs ignorées
+        }
+    ).catch((err) => {
+        console.error('Erreur démarrage scanner QR:', err);
+    });
+}
+
+function addPin(digit) {
+    if (pinCode.length < 6) {
+        pinCode += digit;
+        updatePinDisplay();
+        
+        if (pinCode.length === 6) {
+            setTimeout(submitPin, 500);
+        }
+    }
+}
+
+function clearPin() {
+    pinCode = '';
+    updatePinDisplay();
+}
+
+function updatePinDisplay() {
+    const display = document.getElementById('pin-code');
+    display.value = '*'.repeat(pinCode.length) + '-'.repeat(6 - pinCode.length);
+}
+
+function submitPin() {
+    if (pinCode.length === 6) {
+        performCheckIn('pin', pinCode);
+        clearPin();
+    }
+}
+
+function performCheckIn(method, value) {
+    const data = {
+        method: method,
+        value: value,
+        latitude: window.currentPosition?.latitude,
+        longitude: window.currentPosition?.longitude,
+        device_info: navigator.userAgent
+    };
+    
+    fetch('/api/badge/check-in', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            showConfirmation(result);
+            loadRecentChecks();
+            loadRealtimeStats();
+        } else {
+            showError(result.message);
+        }
+    })
+    .catch(error => {
+        showError('Erreur de connexion');
+    });
+}
+
+function showConfirmation(result) {
+    // Afficher la zone de confirmation
+    document.getElementById('confirmation-zone').style.display = 'block';
+    
+    // Remplir les infos
+    document.getElementById('employee-name').textContent = result.employee.name;
+    document.getElementById('employee-position').textContent = result.employee.position || '-';
+    document.getElementById('employee-department').textContent = result.employee.department || '-';
+    document.getElementById('check-message').textContent = result.message;
+    document.getElementById('check-time').textContent = new Date().toLocaleTimeString('fr-FR');
+    
+    // Photo par défaut ou réelle
+    const photoUrl = result.employee.photo || '/static/img/default-avatar.png';
+    document.getElementById('employee-photo').src = photoUrl;
+    
+    // Icône selon le type d'action
+    const statusIcon = document.querySelector('.status-icon');
+    if (result.action_type === 'check_in') {
+        statusIcon.className = 'fas fa-sign-in-alt status-icon';
+        statusIcon.style.color = '#28a745';
+    } else {
+        statusIcon.className = 'fas fa-sign-out-alt status-icon';
+        statusIcon.style.color = '#dc3545';
+    }
+    
+    // Masquer après 5 secondes
+    setTimeout(() => {
+        document.getElementById('confirmation-zone').style.display = 'none';
+        switchMethod(currentMethod); // Retour à la méthode actuelle
+    }, 5000);
+}
+
+function showError(message) {
+    // Afficher une notification d'erreur
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-danger';
+    alert.textContent = message;
+    
+    document.querySelector('.badge-zone').insertBefore(alert, document.querySelector('.badge-zone').firstChild);
+    
+    setTimeout(() => {
+        alert.remove();
+    }, 3000);
+}
+
+function loadRecentChecks() {
+    // Charger les 10 derniers pointages
+    // Implementation à faire avec l'API
+}
+
+function capturePhoto() {
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+    
+    context.drawImage(video, 0, 0, 320, 240);
+    
+    // Convertir en base64
+    const photoData = canvas.toDataURL('image/jpeg');
+    
+    // Envoyer avec le check-in
+    // À implémenter
+}
+</script>
+{% endblock %}
