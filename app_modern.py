@@ -118,11 +118,47 @@ def inject_global_context():
 # Pages d'erreur personnalisées
 @app.errorhandler(404)
 def not_found_error(error):
-    return render_template('errors/404_modern.html'), 404
+    from flask import render_template_string
+    return render_template_string("""
+    {% extends "base_modern.html" %}
+    {% block title %}Page non trouvée{% endblock %}
+    {% block page_title %}Erreur 404{% endblock %}
+    {% block page_description %}La page que vous recherchez n'existe pas{% endblock %}
+    {% block content %}
+    <div class="card text-center">
+        <div class="card-body py-5">
+            <i class="ri-error-warning-line" style="font-size: 4rem; color: var(--warning);"></i>
+            <h2 class="mt-3">Page non trouvée</h2>
+            <p class="text-muted">La page que vous recherchez n'existe pas ou a été déplacée.</p>
+            <a href="/modern/dashboard" class="btn btn-primary mt-3">
+                <i class="ri-home-line"></i> Retour au tableau de bord
+            </a>
+        </div>
+    </div>
+    {% endblock %}
+    """), 404
 
 @app.errorhandler(500)
 def internal_error(error):
-    return render_template('errors/500_modern.html'), 500
+    from flask import render_template_string
+    return render_template_string("""
+    {% extends "base_modern.html" %}
+    {% block title %}Erreur serveur{% endblock %}
+    {% block page_title %}Erreur 500{% endblock %}
+    {% block page_description %}Une erreur est survenue{% endblock %}
+    {% block content %}
+    <div class="card text-center">
+        <div class="card-body py-5">
+            <i class="ri-error-warning-fill" style="font-size: 4rem; color: var(--danger);"></i>
+            <h2 class="mt-3">Erreur serveur</h2>
+            <p class="text-muted">Une erreur inattendue s'est produite. Veuillez réessayer plus tard.</p>
+            <a href="/modern/dashboard" class="btn btn-primary mt-3">
+                <i class="ri-home-line"></i> Retour au tableau de bord
+            </a>
+        </div>
+    </div>
+    {% endblock %}
+    """), 500
 
 # Initialisation de la base de données
 def init_db():

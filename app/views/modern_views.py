@@ -1,7 +1,7 @@
 """
 Vues modernes pour le nouveau design du CRM Globibat
 """
-from flask import Blueprint, render_template, redirect, url_for, jsonify, request
+from flask import Blueprint, render_template, render_template_string, redirect, url_for, jsonify, request
 from datetime import datetime, date, timedelta
 
 # Flask-Login est optionnel
@@ -45,32 +45,364 @@ def chantiers():
 @modern_bp.route('/factures')
 def factures():
     """Module de gestion des factures"""
-    return render_template('factures_modern.html')
+    return render_template_string("""
+    {% extends "base_modern.html" %}
+    {% block title %}Factures{% endblock %}
+    {% block page_title %}Gestion des Factures{% endblock %}
+    {% block page_description %}Gérez vos factures et paiements{% endblock %}
+    {% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Liste des factures</h3>
+            <button class="btn btn-primary">
+                <i class="ri-file-add-line"></i> Nouvelle facture
+            </button>
+        </div>
+        <div class="card-body">
+            <p>Module de gestion des factures en cours de développement...</p>
+        </div>
+    </div>
+    {% endblock %}
+    """)
 
 @modern_bp.route('/employes')
 def employes():
     """Gestion des employés et RH"""
-    return render_template('employes_modern.html')
+    return render_template_string("""
+    {% extends "base_modern.html" %}
+    {% block title %}Employés{% endblock %}
+    {% block page_title %}Gestion des Employés{% endblock %}
+    {% block page_description %}Gérez vos équipes et ressources humaines{% endblock %}
+    {% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Liste des employés</h3>
+            <button class="btn btn-primary">
+                <i class="ri-user-add-line"></i> Nouvel employé
+            </button>
+        </div>
+        <div class="card-body">
+            <p>Module de gestion des employés en cours de développement...</p>
+        </div>
+    </div>
+    {% endblock %}
+    """)
 
 @modern_bp.route('/clients')
 def clients():
     """Gestion des clients"""
-    return render_template('clients_modern.html')
+    return render_template_string("""
+    {% extends "base_modern.html" %}
+    {% block title %}Clients{% endblock %}
+    {% block page_title %}Gestion des Clients{% endblock %}
+    {% block page_description %}Gérez votre portefeuille clients{% endblock %}
+    {% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Liste des clients</h3>
+            <button class="btn btn-primary">
+                <i class="ri-user-add-line"></i> Nouveau client
+            </button>
+        </div>
+        <div class="card-body">
+            <p>Module de gestion des clients en cours de développement...</p>
+        </div>
+    </div>
+    {% endblock %}
+    """)
 
 @modern_bp.route('/ressources')
 def ressources():
     """Gestion des ressources et matériel"""
-    return render_template('ressources_modern.html')
+    return render_template_string("""
+    {% extends "base_modern.html" %}
+    {% block title %}Ressources{% endblock %}
+    {% block page_title %}Gestion des Ressources{% endblock %}
+    {% block page_description %}Gérez vos machines, outils et matériaux{% endblock %}
+    {% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Inventaire des ressources</h3>
+            <button class="btn btn-primary">
+                <i class="ri-add-line"></i> Ajouter ressource
+            </button>
+        </div>
+        <div class="card-body">
+            <p>Module de gestion des ressources en cours de développement...</p>
+        </div>
+    </div>
+    {% endblock %}
+    """)
 
 @modern_bp.route('/securite')
 def securite():
     """Module sécurité et conformité"""
-    return render_template('securite_modern.html')
+    return render_template_string("""
+    {% extends "base_modern.html" %}
+    {% block title %}Sécurité{% endblock %}
+    {% block page_title %}Sécurité & Conformité{% endblock %}
+    {% block page_description %}Gérez la sécurité sur vos chantiers{% endblock %}
+    {% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Rapports de sécurité</h3>
+            <button class="btn btn-primary">
+                <i class="ri-shield-check-line"></i> Nouveau rapport
+            </button>
+        </div>
+        <div class="card-body">
+            <p>Module de sécurité en cours de développement...</p>
+        </div>
+    </div>
+    {% endblock %}
+    """)
 
 @modern_bp.route('/communication')
 def communication():
     """Communication interne par chantier"""
-    return render_template('communication_modern.html')
+    return render_template_string("""
+    {% extends "base_modern.html" %}
+    {% block title %}Communication{% endblock %}
+    {% block page_title %}Communication Interne{% endblock %}
+    {% block page_description %}Chat et messages par chantier{% endblock %}
+    {% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Messages récents</h3>
+            <button class="btn btn-primary">
+                <i class="ri-message-3-line"></i> Nouveau message
+            </button>
+        </div>
+        <div class="card-body">
+            <p>Module de communication en cours de développement...</p>
+        </div>
+    </div>
+    {% endblock %}
+    """)
+
+# Nouvelles routes pour rendre tous les liens fonctionnels
+@modern_bp.route('/devis')
+def devis():
+    """Module de gestion des devis"""
+    return render_template_string("""
+    {% extends "base_modern.html" %}
+    {% block title %}Devis{% endblock %}
+    {% block page_title %}Gestion des Devis{% endblock %}
+    {% block page_description %}Créer et gérer vos devis{% endblock %}
+    {% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Devis</h3>
+            <button class="btn btn-primary">
+                <i class="ri-add-line"></i> Nouveau devis
+            </button>
+        </div>
+        <div class="card-body">
+            <p>Module de gestion des devis en cours de développement...</p>
+        </div>
+    </div>
+    {% endblock %}
+    """)
+
+@modern_bp.route('/leads')
+def leads():
+    """Gestion des leads/prospects"""
+    return render_template_string("""
+    {% extends "base_modern.html" %}
+    {% block title %}Leads{% endblock %}
+    {% block page_title %}Gestion des Leads{% endblock %}
+    {% block page_description %}Suivez vos prospects et opportunités{% endblock %}
+    {% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Leads & Prospects</h3>
+            <button class="btn btn-primary">
+                <i class="ri-user-add-line"></i> Nouveau lead
+            </button>
+        </div>
+        <div class="card-body">
+            <p>Module de gestion des leads en cours de développement...</p>
+        </div>
+    </div>
+    {% endblock %}
+    """)
+
+@modern_bp.route('/badges')
+def badges():
+    """Module de gestion des badges"""
+    return render_template_string("""
+    {% extends "base_modern.html" %}
+    {% block title %}Badges{% endblock %}
+    {% block page_title %}Gestion des Badges{% endblock %}
+    {% block page_description %}Suivi des badges et présences{% endblock %}
+    {% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Badges du jour</h3>
+            <button class="btn btn-primary">
+                <i class="ri-qr-code-line"></i> Scanner badge
+            </button>
+        </div>
+        <div class="card-body">
+            <p>Module de gestion des badges en cours de développement...</p>
+        </div>
+    </div>
+    {% endblock %}
+    """)
+
+@modern_bp.route('/carte')
+def carte():
+    """Carte des chantiers"""
+    return render_template_string("""
+    {% extends "base_modern.html" %}
+    {% block title %}Carte{% endblock %}
+    {% block page_title %}Carte des Chantiers{% endblock %}
+    {% block page_description %}Visualisez tous vos chantiers sur la carte{% endblock %}
+    {% block content %}
+    <div class="card">
+        <div class="card-body p-0">
+            <div id="map" style="height: 600px; background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
+                <p>Carte interactive en cours de chargement...</p>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+    """)
+
+@modern_bp.route('/paie')
+def paie():
+    """Module de gestion de la paie"""
+    return render_template_string("""
+    {% extends "base_modern.html" %}
+    {% block title %}Paie{% endblock %}
+    {% block page_title %}Gestion de la Paie{% endblock %}
+    {% block page_description %}Gérez les salaires et fiches de paie{% endblock %}
+    {% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Fiches de paie</h3>
+            <button class="btn btn-primary">
+                <i class="ri-file-add-line"></i> Générer fiches de paie
+            </button>
+        </div>
+        <div class="card-body">
+            <p>Module de gestion de la paie en cours de développement...</p>
+        </div>
+    </div>
+    {% endblock %}
+    """)
+
+@modern_bp.route('/rapports')
+def rapports():
+    """Module de rapports et analyses"""
+    return render_template_string("""
+    {% extends "base_modern.html" %}
+    {% block title %}Rapports{% endblock %}
+    {% block page_title %}Rapports & Analyses{% endblock %}
+    {% block page_description %}Tableaux de bord et analyses détaillées{% endblock %}
+    {% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Rapports disponibles</h3>
+            <button class="btn btn-primary">
+                <i class="ri-download-line"></i> Exporter
+            </button>
+        </div>
+        <div class="card-body">
+            <p>Module de rapports en cours de développement...</p>
+        </div>
+    </div>
+    {% endblock %}
+    """)
+
+@modern_bp.route('/budgets')
+def budgets():
+    """Module de gestion des budgets"""
+    return render_template_string("""
+    {% extends "base_modern.html" %}
+    {% block title %}Budgets{% endblock %}
+    {% block page_title %}Gestion des Budgets{% endblock %}
+    {% block page_description %}Suivez et gérez vos budgets par chantier{% endblock %}
+    {% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Budgets par chantier</h3>
+            <button class="btn btn-primary">
+                <i class="ri-add-line"></i> Nouveau budget
+            </button>
+        </div>
+        <div class="card-body">
+            <p>Module de gestion des budgets en cours de développement...</p>
+        </div>
+    </div>
+    {% endblock %}
+    """)
+
+@modern_bp.route('/parametres')
+def parametres():
+    """Paramètres de l'application"""
+    return render_template_string("""
+    {% extends "base_modern.html" %}
+    {% block title %}Paramètres{% endblock %}
+    {% block page_title %}Paramètres{% endblock %}
+    {% block page_description %}Configuration de l'application{% endblock %}
+    {% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Paramètres généraux</h3>
+        </div>
+        <div class="card-body">
+            <p>Configuration en cours de développement...</p>
+        </div>
+    </div>
+    {% endblock %}
+    """)
+
+@modern_bp.route('/utilisateurs')
+def utilisateurs():
+    """Gestion des utilisateurs"""
+    return render_template_string("""
+    {% extends "base_modern.html" %}
+    {% block title %}Utilisateurs{% endblock %}
+    {% block page_title %}Gestion des Utilisateurs{% endblock %}
+    {% block page_description %}Gérez les comptes et permissions{% endblock %}
+    {% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Utilisateurs</h3>
+            <button class="btn btn-primary">
+                <i class="ri-user-add-line"></i> Nouvel utilisateur
+            </button>
+        </div>
+        <div class="card-body">
+            <p>Module de gestion des utilisateurs en cours de développement...</p>
+        </div>
+    </div>
+    {% endblock %}
+    """)
+
+@modern_bp.route('/sauvegarde')
+def sauvegarde():
+    """Module de sauvegarde"""
+    return render_template_string("""
+    {% extends "base_modern.html" %}
+    {% block title %}Sauvegarde{% endblock %}
+    {% block page_title %}Sauvegarde & Restauration{% endblock %}
+    {% block page_description %}Gérez vos sauvegardes{% endblock %}
+    {% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Sauvegardes</h3>
+            <button class="btn btn-primary">
+                <i class="ri-database-2-line"></i> Nouvelle sauvegarde
+            </button>
+        </div>
+        <div class="card-body">
+            <p>Module de sauvegarde en cours de développement...</p>
+        </div>
+    </div>
+    {% endblock %}
+    """)
 
 @modern_bp.route('/api/search')
 def search():

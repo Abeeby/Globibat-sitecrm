@@ -8,7 +8,14 @@ from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_mail import Mail
-from config import Config
+try:
+    from config import Config
+except ImportError:
+    # Configuration de base si Config n'est pas disponible
+    class Config:
+        SECRET_KEY = 'dev-secret-key-for-globibat'
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///instance/globibat.db'
+        SQLALCHEMY_TRACK_MODIFICATIONS = False
 import logging
 from logging.handlers import RotatingFileHandler
 import os
