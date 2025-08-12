@@ -38,7 +38,7 @@
                 <button class="header-btn" id="sidebarToggle">
                     <i class="ri-menu-line"></i>
                 </button>
-                <a href="{{ url_for('main.dashboard') if current_user.is_authenticated else url_for('main.index') }}" class="header-logo">
+                <a href="/modern/dashboard" class="header-logo">
                     <img src="{{ url_for('static', filename='icons/icon-72x72.png') }}" alt="Globibat">
                     <span>Globibat</span>
                 </a>
@@ -85,26 +85,26 @@
                                     <i class="ri-user-3-fill"></i>
                                 </div>
                                 <div class="ms-3">
-                                    <h6 class="mb-0">{{ current_user.username if hasattr(current_user, 'username') else 'Utilisateur' }}</h6>
-                                    <small class="text-muted">{{ current_user.role if hasattr(current_user, 'role') else 'Admin' }}</small>
+                                    <h6 class="mb-0">{{ current_user.username|default('Utilisateur') }}</h6>
+                                    <small class="text-muted">{{ current_user.role|default('Admin') }}</small>
                                 </div>
                             </div>
                         </div>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{{ url_for('auth.profile') if 'auth.profile' in url_for else '#' }}">
+                        <a class="dropdown-item" href="#">
                             <i class="ri-user-line me-2"></i> Mon profil
                         </a>
                         <a class="dropdown-item" href="#">
                             <i class="ri-settings-3-line me-2"></i> Paramètres
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">
+                        <a class="dropdown-item text-danger" href="#">
                             <i class="ri-logout-box-r-line me-2"></i> Déconnexion
                         </a>
                     </div>
                 </div>
                 {% else %}
-                <a href="{{ url_for('auth.login') }}" class="btn btn-primary">
+                <a href="#" class="btn btn-primary">
                     <i class="ri-login-box-line"></i>
                     Connexion
                 </a>
@@ -121,7 +121,7 @@
                     <div class="sidebar-section-title">PRINCIPAL</div>
                     <ul class="sidebar-menu">
                         <li class="sidebar-item">
-                            <a href="{{ url_for('main.dashboard') }}" class="sidebar-link {{ 'active' if request.endpoint == 'main.dashboard' else '' }}">
+                            <a href="/modern/dashboard" class="sidebar-link {{ 'active' if request.endpoint == 'modern.dashboard' else '' }}">
                                 <span class="sidebar-icon">
                                     <i class="ri-dashboard-3-line"></i>
                                 </span>
@@ -136,7 +136,7 @@
                     <div class="sidebar-section-title">GESTION</div>
                     <ul class="sidebar-menu">
                         <li class="sidebar-item">
-                            <a href="{{ url_for('admin.employees_list') if 'admin.employees_list' in url_for else '#' }}" class="sidebar-link">
+                            <a href="#" class="sidebar-link">
                                 <span class="sidebar-icon">
                                     <i class="ri-team-line"></i>
                                 </span>
@@ -145,7 +145,7 @@
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a href="{{ url_for('crm.clients_list') if 'crm.clients_list' in url_for else '#' }}" class="sidebar-link">
+                            <a href="#" class="sidebar-link">
                                 <span class="sidebar-icon">
                                     <i class="ri-user-star-line"></i>
                                 </span>
@@ -162,7 +162,7 @@
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a href="{{ url_for('crm.quotes_list') if 'crm.quotes_list' in url_for else '#' }}" class="sidebar-link">
+                            <a href="#" class="sidebar-link">
                                 <span class="sidebar-icon">
                                     <i class="ri-file-text-line"></i>
                                 </span>
@@ -170,7 +170,7 @@
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a href="{{ url_for('crm.invoices_list') if 'crm.invoices_list' in url_for else '#' }}" class="sidebar-link">
+                            <a href="#" class="sidebar-link">
                                 <span class="sidebar-icon">
                                     <i class="ri-bill-line"></i>
                                 </span>
@@ -194,7 +194,7 @@
                     <div class="sidebar-section-title">OPÉRATIONS</div>
                     <ul class="sidebar-menu">
                         <li class="sidebar-item">
-                            <a href="{{ url_for('badge.index') if 'badge.index' in url_for else '#' }}" class="sidebar-link">
+                            <a href="#" class="sidebar-link">
                                 <span class="sidebar-icon">
                                     <i class="ri-qr-code-line"></i>
                                 </span>
@@ -234,7 +234,7 @@
                     <div class="sidebar-section-title">FINANCE</div>
                     <ul class="sidebar-menu">
                         <li class="sidebar-item">
-                            <a href="{{ url_for('admin.payroll_list') if 'admin.payroll_list' in url_for else '#' }}" class="sidebar-link">
+                            <a href="#" class="sidebar-link">
                                 <span class="sidebar-icon">
                                     <i class="ri-money-euro-circle-line"></i>
                                 </span>
@@ -261,12 +261,12 @@
                 </div>
                 
                 <!-- Administration -->
-                {% if current_user.has_permission('admin') if hasattr(current_user, 'has_permission') else True %}
+                {% if True %}
                 <div class="sidebar-section">
                     <div class="sidebar-section-title">ADMINISTRATION</div>
                     <ul class="sidebar-menu">
                         <li class="sidebar-item">
-                            <a href="{{ url_for('admin.dashboard') if 'admin.dashboard' in url_for else '#' }}" class="sidebar-link">
+                            <a href="#" class="sidebar-link">
                                 <span class="sidebar-icon">
                                     <i class="ri-settings-3-line"></i>
                                 </span>
@@ -302,7 +302,7 @@
             {% block breadcrumb %}
             <nav aria-label="breadcrumb" class="mb-4">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url_for('main.dashboard') if current_user.is_authenticated else url_for('main.index') }}">Accueil</a></li>
+                    <li class="breadcrumb-item"><a href="/modern/dashboard">Accueil</a></li>
                     {% block breadcrumb_items %}{% endblock %}
                 </ol>
             </nav>
