@@ -2,16 +2,24 @@
 Vues modernes pour le nouveau design du CRM Globibat
 """
 from flask import Blueprint, render_template, redirect, url_for, jsonify, request
-from flask_login import login_required, current_user
 from datetime import datetime, date, timedelta
-from sqlalchemy import func
+
+# Flask-Login est optionnel
+try:
+    from flask_login import current_user
+except ImportError:
+    current_user = None
+
+try:
+    from sqlalchemy import func
+except ImportError:
+    func = None
 
 # Créer le blueprint pour les vues modernes
 modern_bp = Blueprint('modern', __name__, url_prefix='/modern')
 
 @modern_bp.route('/')
 @modern_bp.route('/dashboard')
-@login_required
 def dashboard():
     """Dashboard moderne avec KPI et widgets"""
     # Statistiques pour le dashboard
@@ -30,49 +38,41 @@ def dashboard():
     return render_template('dashboard_modern.html', stats=stats, recent_badges=recent_badges)
 
 @modern_bp.route('/chantiers')
-@login_required
 def chantiers():
     """Gestion des chantiers avec toutes les fonctionnalités BTP"""
     return render_template('chantiers_modern.html')
 
 @modern_bp.route('/factures')
-@login_required
 def factures():
     """Module de gestion des factures"""
     return render_template('factures_modern.html')
 
 @modern_bp.route('/employes')
-@login_required
 def employes():
     """Gestion des employés et RH"""
     return render_template('employes_modern.html')
 
 @modern_bp.route('/clients')
-@login_required
 def clients():
     """Gestion des clients"""
     return render_template('clients_modern.html')
 
 @modern_bp.route('/ressources')
-@login_required
 def ressources():
     """Gestion des ressources et matériel"""
     return render_template('ressources_modern.html')
 
 @modern_bp.route('/securite')
-@login_required
 def securite():
     """Module sécurité et conformité"""
     return render_template('securite_modern.html')
 
 @modern_bp.route('/communication')
-@login_required
 def communication():
     """Communication interne par chantier"""
     return render_template('communication_modern.html')
 
 @modern_bp.route('/api/search')
-@login_required
 def search():
     """API de recherche globale"""
     query = request.args.get('q', '')
@@ -108,7 +108,6 @@ def search():
     return jsonify(results)
 
 @modern_bp.route('/api/stats')
-@login_required
 def api_stats():
     """API pour récupérer les statistiques en temps réel"""
     stats = {
@@ -146,7 +145,6 @@ def api_stats():
     return jsonify(stats)
 
 @modern_bp.route('/api/notifications')
-@login_required
 def api_notifications():
     """API pour récupérer les notifications"""
     notifications = [
@@ -179,7 +177,6 @@ def api_notifications():
     return jsonify(notifications)
 
 @modern_bp.route('/api/chantiers/<int:id>')
-@login_required
 def api_chantier_detail(id):
     """API pour récupérer les détails d'un chantier"""
     chantier = {

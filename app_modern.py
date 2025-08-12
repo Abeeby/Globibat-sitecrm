@@ -1,14 +1,27 @@
 """
 Application Flask avec le nouveau design moderne du CRM Globibat
 """
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, Blueprint
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, login_required
 from datetime import datetime
 import os
+import sys
 
-# Créer l'application Flask
-app = Flask(__name__)
+# Flask-Login est optionnel
+try:
+    from flask_login import LoginManager, login_required
+    HAS_LOGIN = True
+except ImportError:
+    HAS_LOGIN = False
+    print("ℹ️ Flask-Login non installé, authentification désactivée")
+
+# Ajouter le répertoire app au path Python
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'app'))
+
+# Créer l'application Flask avec les bons chemins
+app = Flask(__name__, 
+            template_folder='app/templates',
+            static_folder='app/static')
 
 # Configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-globibat-2024')
@@ -17,13 +30,33 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialiser les extensions
 db = SQLAlchemy(app)
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'auth.login'
+
+# Configurer Flask-Login si disponible
+if HAS_LOGIN:
+    login_manager = LoginManager()
+    login_manager.init_app(app)
+    login_manager.login_view = 'auth.login'
 
 # Importer et enregistrer les blueprints
-from app.views.modern_views import modern_bp
-app.register_blueprint(modern_bp)
+try:
+    from app.views.modern_views import modern_bp
+    app.register_blueprint(modern_bp)
+except ImportError as e:
+    print(f"⚠️ Erreur d'import des vues modernes: {e}")
+    # Créer un blueprint minimal si l'import échoue
+    from flask import Blueprint
+    modern_bp = Blueprint('modern', __name__, url_prefix='/modern')
+    
+    @modern_bp.route('/')
+    @modern_bp.route('/dashboard')
+    def dashboard():
+        return render_template('dashboard_modern.html', stats={}, recent_badges=[])
+    
+    @modern_bp.route('/chantiers')
+    def chantiers():
+        return render_template('chantiers_modern.html')
+    
+    app.register_blueprint(modern_bp)
 
 # Importer les vues existantes si nécessaire
 try:
@@ -34,8 +67,8 @@ try:
     app.register_blueprint(crm.bp)
     app.register_blueprint(badge.bp)
     app.register_blueprint(website.bp)
-except ImportError:
-    pass
+except ImportError as e:
+    print(f"ℹ️ Modules existants non trouvés (normal pour une nouvelle installation): {e}")
 
 # Route racine qui redirige vers le dashboard moderne
 @app.route('/')
@@ -43,29 +76,30 @@ def index():
     return redirect(url_for('modern.dashboard'))
 
 # Gestionnaire de connexion pour Flask-Login
-@login_manager.user_loader
-def load_user(user_id):
-    try:
-        from app.models.user import User
-        return User.query.get(int(user_id))
-    except:
-        # Si les modèles ne sont pas disponibles, utiliser un utilisateur factice
-        class DummyUser:
-            def __init__(self):
-                self.id = 1
-                self.username = 'admin'
-                self.is_authenticated = True
-                self.is_active = True
-                self.is_anonymous = False
-                self.role = 'admin'
+if HAS_LOGIN:
+    @login_manager.user_loader
+    def load_user(user_id):
+        try:
+            from app.models.user import User
+            return User.query.get(int(user_id))
+        except:
+            # Si les modèles ne sont pas disponibles, utiliser un utilisateur factice
+            class DummyUser:
+                def __init__(self):
+                    self.id = 1
+                    self.username = 'admin'
+                    self.is_authenticated = True
+                    self.is_active = True
+                    self.is_anonymous = False
+                    self.role = 'admin'
+                
+                def get_id(self):
+                    return str(self.id)
+                
+                def has_permission(self, permission):
+                    return True
             
-            def get_id(self):
-                return str(self.id)
-            
-            def has_permission(self, permission):
-                return True
-        
-        return DummyUser()
+            return DummyUser()
 
 # Contexte global pour tous les templates
 @app.context_processor
