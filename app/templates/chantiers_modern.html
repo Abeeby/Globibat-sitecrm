@@ -1,0 +1,1192 @@
+{% extends "base_modern.html" %}
+
+{% block title %}Gestion des Chantiers{% endblock %}
+{% block page_title %}Gestion des Chantiers{% endblock %}
+{% block page_description %}Suivi complet des chantiers en cours et planning{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.css">
+<style>
+.chantier-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.chantier-filters {
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: center;
+}
+
+.chantier-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.chantier-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: all var(--transition-base);
+    cursor: pointer;
+}
+
+.chantier-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.chantier-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    position: relative;
+}
+
+.chantier-status {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+}
+
+.chantier-status.active {
+    background: rgba(39, 174, 96, 0.9);
+    color: white;
+}
+
+.chantier-status.delayed {
+    background: rgba(255, 122, 0, 0.9);
+    color: white;
+}
+
+.chantier-status.completed {
+    background: rgba(0, 91, 187, 0.9);
+    color: white;
+}
+
+.chantier-content {
+    padding: var(--spacing-lg);
+}
+
+.chantier-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-primary);
+}
+
+.chantier-location {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.chantier-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-color);
+}
+
+.chantier-stat {
+    text-align: center;
+}
+
+.chantier-stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.chantier-stat-label {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+}
+
+.progress-bar-container {
+    margin: var(--spacing-md) 0;
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-xs);
+    font-size: 0.875rem;
+}
+
+.gantt-container {
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    overflow-x: auto;
+}
+
+.map-container {
+    height: 400px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 40px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border-color);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: var(--spacing-xl);
+    padding: var(--spacing-lg);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.timeline-item:hover {
+    background: var(--bg-tertiary);
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -25px;
+    top: 24px;
+    width: 12px;
+    height: 12px;
+    background: var(--primary);
+    border: 3px solid var(--bg-primary);
+    border-radius: 50%;
+}
+
+.timeline-date {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-sm);
+}
+
+.timeline-title {
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+}
+
+.timeline-content {
+    color: var(--text-secondary);
+}
+
+.timeline-images {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+}
+
+.timeline-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.timeline-image:hover {
+    transform: scale(1.05);
+}
+
+.checklist-container {
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+}
+
+.checklist-phase {
+    margin-bottom: var(--spacing-xl);
+}
+
+.checklist-phase-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.checklist-phase-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.checklist-progress {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.checklist-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.checklist-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.checklist-item:hover {
+    background: var(--bg-tertiary);
+}
+
+.checklist-checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.checklist-checkbox.checked {
+    background: var(--success);
+    border-color: var(--success);
+}
+
+.checklist-label {
+    flex: 1;
+}
+
+.checklist-item.completed .checklist-label {
+    text-decoration: line-through;
+    color: var(--text-muted);
+}
+
+.photo-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.photo-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.photo-item:hover {
+    transform: scale(1.05);
+}
+
+.photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.photo-item-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.7));
+    display: flex;
+    align-items: flex-end;
+    padding: var(--spacing-sm);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.photo-item:hover .photo-item-overlay {
+    opacity: 1;
+}
+
+.photo-label {
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.upload-zone {
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-2xl);
+    text-align: center;
+    background: var(--bg-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.upload-zone:hover {
+    border-color: var(--primary);
+    background: var(--primary-alpha);
+}
+
+.upload-zone-icon {
+    font-size: 3rem;
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-md);
+}
+
+.upload-zone-text {
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.upload-zone-hint {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.tabs-container {
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: var(--spacing-xl);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn var(--transition-base);
+}
+</style>
+{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active" aria-current="page">Chantiers</li>
+{% endblock %}
+
+{% block content %}
+<!-- Header avec filtres -->
+<div class="chantier-header">
+    <div class="chantier-filters">
+        <select class="form-control" style="width: 200px;">
+            <option>Tous les statuts</option>
+            <option>En cours</option>
+            <option>En retard</option>
+            <option>Terminés</option>
+            <option>En pause</option>
+        </select>
+        
+        <select class="form-control" style="width: 200px;">
+            <option>Toutes les régions</option>
+            <option>Genève</option>
+            <option>Lausanne</option>
+            <option>Fribourg</option>
+            <option>Neuchâtel</option>
+        </select>
+        
+        <input type="text" class="form-control" placeholder="Rechercher un chantier..." style="width: 300px;">
+    </div>
+    
+    <button class="btn btn-primary" onclick="openNewChantierModal()">
+        <i class="ri-add-line"></i> Nouveau chantier
+    </button>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+    <div class="tab active" onclick="switchTab('overview')">Vue d'ensemble</div>
+    <div class="tab" onclick="switchTab('gantt')">Planning Gantt</div>
+    <div class="tab" onclick="switchTab('map')">Carte</div>
+    <div class="tab" onclick="switchTab('resources')">Ressources</div>
+</div>
+
+<!-- Tab Content - Vue d'ensemble -->
+<div id="tab-overview" class="tab-content active">
+    <div class="chantier-grid">
+        <!-- Chantier 1 -->
+        <div class="chantier-card" onclick="openChantierDetail('1')">
+            <div style="position: relative;">
+                <img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=400&h=200&fit=crop" alt="Chantier" class="chantier-image">
+                <span class="chantier-status active">En cours</span>
+            </div>
+            <div class="chantier-content">
+                <h3 class="chantier-title">Immeuble résidentiel Les Jardins</h3>
+                <div class="chantier-location">
+                    <i class="ri-map-pin-line"></i>
+                    <span>Genève Centre</span>
+                </div>
+                
+                <div class="progress-bar-container">
+                    <div class="progress-label">
+                        <span>Progression</span>
+                        <span class="text-primary">65%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: 65%"></div>
+                    </div>
+                </div>
+                
+                <div class="chantier-stats">
+                    <div class="chantier-stat">
+                        <div class="chantier-stat-value">12</div>
+                        <div class="chantier-stat-label">Employés</div>
+                    </div>
+                    <div class="chantier-stat">
+                        <div class="chantier-stat-value">45</div>
+                        <div class="chantier-stat-label">Jours restants</div>
+                    </div>
+                    <div class="chantier-stat">
+                        <div class="chantier-stat-value">2.3M</div>
+                        <div class="chantier-stat-label">Budget CHF</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chantier 2 -->
+        <div class="chantier-card" onclick="openChantierDetail('2')">
+            <div style="position: relative;">
+                <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&h=200&fit=crop" alt="Chantier" class="chantier-image">
+                <span class="chantier-status delayed">En retard</span>
+            </div>
+            <div class="chantier-content">
+                <h3 class="chantier-title">Rénovation Centre Commercial</h3>
+                <div class="chantier-location">
+                    <i class="ri-map-pin-line"></i>
+                    <span>Lausanne Ouest</span>
+                </div>
+                
+                <div class="progress-bar-container">
+                    <div class="progress-label">
+                        <span>Progression</span>
+                        <span class="text-warning">42%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar warning" style="width: 42%"></div>
+                    </div>
+                </div>
+                
+                <div class="chantier-stats">
+                    <div class="chantier-stat">
+                        <div class="chantier-stat-value">8</div>
+                        <div class="chantier-stat-label">Employés</div>
+                    </div>
+                    <div class="chantier-stat">
+                        <div class="chantier-stat-value text-danger">-5</div>
+                        <div class="chantier-stat-label">Jours retard</div>
+                    </div>
+                    <div class="chantier-stat">
+                        <div class="chantier-stat-value">1.8M</div>
+                        <div class="chantier-stat-label">Budget CHF</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chantier 3 -->
+        <div class="chantier-card" onclick="openChantierDetail('3')">
+            <div style="position: relative;">
+                <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=400&h=200&fit=crop" alt="Chantier" class="chantier-image">
+                <span class="chantier-status completed">Terminé</span>
+            </div>
+            <div class="chantier-content">
+                <h3 class="chantier-title">Villa moderne Lac Léman</h3>
+                <div class="chantier-location">
+                    <i class="ri-map-pin-line"></i>
+                    <span>Montreux</span>
+                </div>
+                
+                <div class="progress-bar-container">
+                    <div class="progress-label">
+                        <span>Progression</span>
+                        <span class="text-success">100%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar success" style="width: 100%"></div>
+                    </div>
+                </div>
+                
+                <div class="chantier-stats">
+                    <div class="chantier-stat">
+                        <div class="chantier-stat-value">6</div>
+                        <div class="chantier-stat-label">Employés</div>
+                    </div>
+                    <div class="chantier-stat">
+                        <div class="chantier-stat-value text-success">✓</div>
+                        <div class="chantier-stat-label">Livré</div>
+                    </div>
+                    <div class="chantier-stat">
+                        <div class="chantier-stat-value">890K</div>
+                        <div class="chantier-stat-label">Budget CHF</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tab Content - Planning Gantt -->
+<div id="tab-gantt" class="tab-content">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Planning Gantt des chantiers</h3>
+            <div class="btn-group">
+                <button class="btn btn-secondary btn-sm">Jour</button>
+                <button class="btn btn-secondary btn-sm active">Semaine</button>
+                <button class="btn btn-secondary btn-sm">Mois</button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="gantt-container">
+                <svg id="gantt"></svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tab Content - Carte -->
+<div id="tab-map" class="tab-content">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Localisation des chantiers</h3>
+        </div>
+        <div class="card-body p-0">
+            <div id="chantiersMap" class="map-container"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Tab Content - Ressources -->
+<div id="tab-resources" class="tab-content">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Machines & Équipements</h3>
+                    <button class="btn btn-primary btn-sm">
+                        <i class="ri-add-line"></i> Ajouter
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Équipement</th>
+                                    <th>État</th>
+                                    <th>Chantier</th>
+                                    <th>Prochaine maintenance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="ri-excavator-line text-warning" style="font-size: 1.5rem;"></i>
+                                            <div>
+                                                <div class="fw-500">Pelleteuse CAT 320</div>
+                                                <small class="text-muted">#EQ-001</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge badge-success">Opérationnel</span></td>
+                                    <td>Genève Centre</td>
+                                    <td><span class="text-warning">Dans 5 jours</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="ri-truck-line text-info" style="font-size: 1.5rem;"></i>
+                                            <div>
+                                                <div class="fw-500">Camion benne Volvo</div>
+                                                <small class="text-muted">#EQ-002</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge badge-warning">Maintenance</span></td>
+                                    <td>-</td>
+                                    <td><span class="text-danger">En cours</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="ri-tools-fill text-primary" style="font-size: 1.5rem;"></i>
+                                            <div>
+                                                <div class="fw-500">Grue mobile 50T</div>
+                                                <small class="text-muted">#EQ-003</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge badge-success">Opérationnel</span></td>
+                                    <td>Lausanne Ouest</td>
+                                    <td>15 Mars 2024</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Stock Matériaux</h3>
+                    <button class="btn btn-primary btn-sm">
+                        <i class="ri-add-line"></i> Commander
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="material-list">
+                        <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded mb-2">
+                            <div>
+                                <div class="fw-500">Ciment Portland</div>
+                                <small class="text-muted">Stock central</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-600">120 sacs</div>
+                                <div class="progress" style="width: 100px; height: 4px;">
+                                    <div class="progress-bar bg-success" style="width: 70%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded mb-2">
+                            <div>
+                                <div class="fw-500">Fer à béton 12mm</div>
+                                <small class="text-muted">Stock central</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-600">45 barres</div>
+                                <div class="progress" style="width: 100px; height: 4px;">
+                                    <div class="progress-bar bg-warning" style="width: 30%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded mb-2">
+                            <div>
+                                <div class="fw-500">Briques standard</div>
+                                <small class="text-muted">Chantier Genève</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-600">2500 unités</div>
+                                <div class="progress" style="width: 100px; height: 4px;">
+                                    <div class="progress-bar bg-danger" style="width: 15%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Détail Chantier -->
+<div class="modal" id="chantierDetailModal">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Immeuble résidentiel Les Jardins</h3>
+                <button class="btn btn-ghost btn-icon" onclick="closeModal('chantierDetailModal')">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Sous-tabs -->
+                <div class="tabs-container">
+                    <div class="tabs">
+                        <div class="tab active" onclick="switchSubTab('timeline')">Timeline</div>
+                        <div class="tab" onclick="switchSubTab('checklist')">Check-list</div>
+                        <div class="tab" onclick="switchSubTab('photos')">Photos</div>
+                        <div class="tab" onclick="switchSubTab('documents')">Documents</div>
+                        <div class="tab" onclick="switchSubTab('budget')">Budget</div>
+                    </div>
+                </div>
+                
+                <!-- Timeline -->
+                <div id="subtab-timeline" class="tab-content active">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-date">Aujourd'hui - 14:30</div>
+                            <div class="timeline-title">Coulage dalle 3ème étage terminé</div>
+                            <div class="timeline-content">
+                                La dalle du 3ème étage a été coulée avec succès. Temps de séchage estimé : 48h.
+                            </div>
+                            <div class="timeline-images">
+                                <img src="https://images.unsplash.com/photo-1587582345426-bf07f534b063?w=150" class="timeline-image" alt="Photo chantier">
+                                <img src="https://images.unsplash.com/photo-1581094794329-c8112d4e5190?w=150" class="timeline-image" alt="Photo chantier">
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">Hier - 09:15</div>
+                            <div class="timeline-title">Livraison matériaux</div>
+                            <div class="timeline-content">
+                                Réception de 50 sacs de ciment et 200 parpaings pour la construction du 4ème étage.
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">Lundi 12 Février</div>
+                            <div class="timeline-title">Inspection sécurité</div>
+                            <div class="timeline-content">
+                                Inspection de sécurité réussie. Tous les équipements sont conformes aux normes.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Check-list -->
+                <div id="subtab-checklist" class="tab-content">
+                    <div class="checklist-container">
+                        <div class="checklist-phase">
+                            <div class="checklist-phase-header">
+                                <h4 class="checklist-phase-title">Phase 1 : Fondations</h4>
+                                <span class="checklist-progress text-success">100% complété</span>
+                            </div>
+                            <div class="checklist-items">
+                                <div class="checklist-item completed">
+                                    <div class="checklist-checkbox checked">✓</div>
+                                    <span class="checklist-label">Terrassement</span>
+                                </div>
+                                <div class="checklist-item completed">
+                                    <div class="checklist-checkbox checked">✓</div>
+                                    <span class="checklist-label">Coulage fondations</span>
+                                </div>
+                                <div class="checklist-item completed">
+                                    <div class="checklist-checkbox checked">✓</div>
+                                    <span class="checklist-label">Imperméabilisation</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-phase">
+                            <div class="checklist-phase-header">
+                                <h4 class="checklist-phase-title">Phase 2 : Gros œuvre</h4>
+                                <span class="checklist-progress text-warning">60% complété</span>
+                            </div>
+                            <div class="checklist-items">
+                                <div class="checklist-item completed">
+                                    <div class="checklist-checkbox checked">✓</div>
+                                    <span class="checklist-label">Murs porteurs RDC</span>
+                                </div>
+                                <div class="checklist-item completed">
+                                    <div class="checklist-checkbox checked">✓</div>
+                                    <span class="checklist-label">Dalle 1er étage</span>
+                                </div>
+                                <div class="checklist-item">
+                                    <div class="checklist-checkbox"></div>
+                                    <span class="checklist-label">Murs porteurs 1er étage</span>
+                                </div>
+                                <div class="checklist-item">
+                                    <div class="checklist-checkbox"></div>
+                                    <span class="checklist-label">Dalle 2ème étage</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Photos -->
+                <div id="subtab-photos" class="tab-content">
+                    <div class="mb-3">
+                        <h4>Galerie photos du chantier</h4>
+                        <div class="d-flex gap-2 mb-3">
+                            <button class="btn btn-secondary btn-sm">Toutes</button>
+                            <button class="btn btn-secondary btn-sm">Avant</button>
+                            <button class="btn btn-secondary btn-sm">En cours</button>
+                            <button class="btn btn-secondary btn-sm">Après</button>
+                        </div>
+                    </div>
+                    
+                    <div class="photo-gallery">
+                        <div class="photo-item">
+                            <img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=300" alt="Photo chantier">
+                            <div class="photo-item-overlay">
+                                <span class="photo-label">Vue générale - 15/02</span>
+                            </div>
+                        </div>
+                        <div class="photo-item">
+                            <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=300" alt="Photo chantier">
+                            <div class="photo-item-overlay">
+                                <span class="photo-label">Fondations - 01/02</span>
+                            </div>
+                        </div>
+                        <div class="photo-item">
+                            <img src="https://images.unsplash.com/photo-1587582345426-bf07f534b063?w=300" alt="Photo chantier">
+                            <div class="photo-item-overlay">
+                                <span class="photo-label">Dalle 1er - 10/02</span>
+                            </div>
+                        </div>
+                        <div class="upload-zone">
+                            <div class="upload-zone-icon">
+                                <i class="ri-upload-cloud-2-line"></i>
+                            </div>
+                            <div class="upload-zone-text">Glisser-déposer des photos ici</div>
+                            <div class="upload-zone-hint">ou cliquer pour sélectionner</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Documents -->
+                <div id="subtab-documents" class="tab-content">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="mb-3">Plans</h5>
+                            <div class="list-group">
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex align-items-center">
+                                        <i class="ri-file-pdf-line text-danger me-3" style="font-size: 1.5rem;"></i>
+                                        <div class="flex-grow-1">
+                                            <div>Plan architectural RDC.pdf</div>
+                                            <small class="text-muted">2.3 MB - 12/01/2024</small>
+                                        </div>
+                                        <i class="ri-download-line"></i>
+                                    </div>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex align-items-center">
+                                        <i class="ri-file-3-line text-primary me-3" style="font-size: 1.5rem;"></i>
+                                        <div class="flex-grow-1">
+                                            <div>Plan structure.dwg</div>
+                                            <small class="text-muted">5.1 MB - 10/01/2024</small>
+                                        </div>
+                                        <i class="ri-download-line"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5 class="mb-3">Documents administratifs</h5>
+                            <div class="list-group">
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex align-items-center">
+                                        <i class="ri-file-text-line text-success me-3" style="font-size: 1.5rem;"></i>
+                                        <div class="flex-grow-1">
+                                            <div>Permis de construire.pdf</div>
+                                            <small class="text-muted">450 KB - 05/12/2023</small>
+                                        </div>
+                                        <i class="ri-download-line"></i>
+                                    </div>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex align-items-center">
+                                        <i class="ri-file-shield-2-line text-warning me-3" style="font-size: 1.5rem;"></i>
+                                        <div class="flex-grow-1">
+                                            <div>Rapport sécurité.pdf</div>
+                                            <small class="text-muted">1.2 MB - 12/02/2024</small>
+                                        </div>
+                                        <i class="ri-download-line"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Budget -->
+                <div id="subtab-budget" class="tab-content">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5 class="mb-3">Suivi budgétaire</h5>
+                            <canvas id="budgetChart" height="100"></canvas>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="text-muted mb-3">Résumé financier</h6>
+                                    <div class="mb-3">
+                                        <div class="text-muted small">Budget total</div>
+                                        <div class="h4 mb-0">CHF 2,300,000</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="text-muted small">Dépensé</div>
+                                        <div class="h4 mb-0 text-warning">CHF 1,495,000</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="text-muted small">Restant</div>
+                                        <div class="h4 mb-0 text-success">CHF 805,000</div>
+                                    </div>
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar bg-warning" style="width: 65%"></div>
+                                    </div>
+                                    <div class="text-center text-muted small">65% du budget utilisé</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('chantierDetailModal')">Fermer</button>
+                <button class="btn btn-primary">
+                    <i class="ri-save-line"></i> Enregistrer les modifications
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.js"></script>
+<script>
+// Fonction pour changer d'onglet
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    document.getElementById('tab-' + tabName).classList.add('active');
+    
+    document.querySelectorAll('.tabs .tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Initialiser la carte si on affiche l'onglet carte
+    if (tabName === 'map') {
+        setTimeout(initMap, 100);
+    }
+    
+    // Initialiser le Gantt si on affiche l'onglet Gantt
+    if (tabName === 'gantt') {
+        setTimeout(initGantt, 100);
+    }
+}
+
+// Fonction pour changer de sous-onglet
+function switchSubTab(tabName) {
+    document.querySelectorAll('#chantierDetailModal .tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    document.getElementById('subtab-' + tabName).classList.add('active');
+    
+    document.querySelectorAll('#chantierDetailModal .tabs .tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Initialiser le graphique budget si nécessaire
+    if (tabName === 'budget') {
+        setTimeout(initBudgetChart, 100);
+    }
+}
+
+// Fonction pour ouvrir le détail d'un chantier
+function openChantierDetail(id) {
+    document.getElementById('chantierDetailModal').classList.add('show');
+    document.getElementById('chantierDetailModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+// Fonction pour fermer une modal
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('show');
+    document.getElementById(modalId).style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// Initialiser la carte Leaflet
+function initMap() {
+    if (document.getElementById('chantiersMap')._leaflet_id) {
+        return; // La carte est déjà initialisée
+    }
+    
+    const map = L.map('chantiersMap').setView([46.5197, 6.6323], 9);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+    
+    // Ajouter des marqueurs pour les chantiers
+    const chantiers = [
+        { name: 'Immeuble Les Jardins', coords: [46.2044, 6.1432], status: 'active' },
+        { name: 'Centre Commercial', coords: [46.5197, 6.6323], status: 'delayed' },
+        { name: 'Villa Lac Léman', coords: [46.4312, 6.9107], status: 'completed' }
+    ];
+    
+    chantiers.forEach(chantier => {
+        const color = chantier.status === 'active' ? 'green' : 
+                     chantier.status === 'delayed' ? 'orange' : 'blue';
+        
+        L.circleMarker(chantier.coords, {
+            radius: 10,
+            fillColor: color,
+            color: '#fff',
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.8
+        }).addTo(map)
+          .bindPopup(`<b>${chantier.name}</b><br>Statut: ${chantier.status}`);
+    });
+}
+
+// Initialiser le diagramme de Gantt
+function initGantt() {
+    const tasks = [
+        {
+            id: 'Task 1',
+            name: 'Fondations',
+            start: '2024-01-01',
+            end: '2024-01-30',
+            progress: 100
+        },
+        {
+            id: 'Task 2',
+            name: 'Gros œuvre',
+            start: '2024-01-15',
+            end: '2024-03-15',
+            progress: 65,
+            dependencies: 'Task 1'
+        },
+        {
+            id: 'Task 3',
+            name: 'Toiture',
+            start: '2024-03-01',
+            end: '2024-04-15',
+            progress: 20,
+            dependencies: 'Task 2'
+        },
+        {
+            id: 'Task 4',
+            name: 'Second œuvre',
+            start: '2024-03-15',
+            end: '2024-05-30',
+            progress: 10,
+            dependencies: 'Task 2'
+        },
+        {
+            id: 'Task 5',
+            name: 'Finitions',
+            start: '2024-05-15',
+            end: '2024-06-30',
+            progress: 0,
+            dependencies: 'Task 3, Task 4'
+        }
+    ];
+    
+    const gantt = new Gantt("#gantt", tasks, {
+        view_mode: 'Week',
+        date_format: 'YYYY-MM-DD',
+        language: 'fr'
+    });
+}
+
+// Initialiser le graphique de budget
+function initBudgetChart() {
+    const ctx = document.getElementById('budgetChart');
+    if (!ctx) return;
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Fév', 'Mars', 'Avril', 'Mai', 'Juin'],
+            datasets: [
+                {
+                    label: 'Budget prévu',
+                    data: [200000, 400000, 800000, 1200000, 1800000, 2300000],
+                    borderColor: 'rgba(0, 91, 187, 1)',
+                    backgroundColor: 'rgba(0, 91, 187, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4
+                },
+                {
+                    label: 'Dépenses réelles',
+                    data: [180000, 380000, 750000, 1100000, 1495000, null],
+                    borderColor: 'rgba(255, 122, 0, 1)',
+                    backgroundColor: 'rgba(255, 122, 0, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'CHF ' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Upload de fichiers
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadZone = document.querySelector('.upload-zone');
+    if (uploadZone) {
+        uploadZone.addEventListener('click', function() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.multiple = true;
+            input.accept = 'image/*';
+            input.click();
+            
+            input.addEventListener('change', function(e) {
+                const files = e.target.files;
+                console.log('Fichiers sélectionnés:', files);
+                // Ici vous pouvez ajouter la logique d'upload
+            });
+        });
+        
+        uploadZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.style.borderColor = 'var(--primary)';
+            this.style.background = 'var(--primary-alpha)';
+        });
+        
+        uploadZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.style.borderColor = 'var(--border-color)';
+            this.style.background = 'var(--bg-secondary)';
+        });
+        
+        uploadZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.borderColor = 'var(--border-color)';
+            this.style.background = 'var(--bg-secondary)';
+            
+            const files = e.dataTransfer.files;
+            console.log('Fichiers déposés:', files);
+            // Ici vous pouvez ajouter la logique d'upload
+        });
+    }
+});
+</script>
+{% endblock %}

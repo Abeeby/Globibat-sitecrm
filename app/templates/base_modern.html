@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <!-- SEO Meta Tags -->
+    <title>{% block title %}Dashboard{% endblock %} - Globibat CRM</title>
+    <meta name="description" content="CRM premium pour l'entreprise de construction Globibat - Gestion des chantiers, employés et ressources">
+    <meta name="keywords" content="CRM, BTP, construction, gestion chantiers, Suisse, Globibat">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Globibat SA">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Globibat CRM - Gestion de chantiers">
+    <meta property="og:description" content="Solution CRM complète pour la gestion des chantiers et des équipes">
+    <meta property="og:locale" content="fr_CH">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='icons/icon-72x72.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='icons/icon-192x192.png') }}">
+    
+    <!-- CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/modern-design-system.css') }}" rel="stylesheet">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <button class="header-btn" id="sidebarToggle">
+                    <i class="ri-menu-line"></i>
+                </button>
+                <a href="{{ url_for('main.dashboard') if current_user.is_authenticated else url_for('main.index') }}" class="header-logo">
+                    <img src="{{ url_for('static', filename='icons/icon-72x72.png') }}" alt="Globibat">
+                    <span>Globibat</span>
+                </a>
+            </div>
+            
+            <div class="header-center">
+                <div class="header-search">
+                    <i class="ri-search-line header-search-icon"></i>
+                    <input type="text" placeholder="Rechercher un chantier, client, employé..." id="globalSearch">
+                </div>
+            </div>
+            
+            <div class="header-right">
+                {% if current_user.is_authenticated %}
+                <!-- Notifications -->
+                <button class="header-btn has-badge" id="notificationBtn">
+                    <i class="ri-notification-3-line"></i>
+                </button>
+                
+                <!-- Messages -->
+                <button class="header-btn" id="messageBtn">
+                    <i class="ri-message-3-line"></i>
+                </button>
+                
+                <!-- Theme Toggle -->
+                <div class="theme-toggle">
+                    <button class="active" data-theme="light">
+                        <i class="ri-sun-line"></i>
+                    </button>
+                    <button data-theme="dark">
+                        <i class="ri-moon-line"></i>
+                    </button>
+                </div>
+                
+                <!-- Profile -->
+                <div class="dropdown">
+                    <button class="header-btn" data-bs-toggle="dropdown">
+                        <i class="ri-user-3-line"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <div class="dropdown-header">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar">
+                                    <i class="ri-user-3-fill"></i>
+                                </div>
+                                <div class="ms-3">
+                                    <h6 class="mb-0">{{ current_user.username if hasattr(current_user, 'username') else 'Utilisateur' }}</h6>
+                                    <small class="text-muted">{{ current_user.role if hasattr(current_user, 'role') else 'Admin' }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{{ url_for('auth.profile') if 'auth.profile' in url_for else '#' }}">
+                            <i class="ri-user-line me-2"></i> Mon profil
+                        </a>
+                        <a class="dropdown-item" href="#">
+                            <i class="ri-settings-3-line me-2"></i> Paramètres
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">
+                            <i class="ri-logout-box-r-line me-2"></i> Déconnexion
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn btn-primary">
+                    <i class="ri-login-box-line"></i>
+                    Connexion
+                </a>
+                {% endif %}
+            </div>
+        </header>
+        
+        {% if current_user.is_authenticated %}
+        <!-- Sidebar -->
+        <aside class="app-sidebar" id="sidebar">
+            <nav class="sidebar-nav">
+                <!-- Dashboard -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">PRINCIPAL</div>
+                    <ul class="sidebar-menu">
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('main.dashboard') }}" class="sidebar-link {{ 'active' if request.endpoint == 'main.dashboard' else '' }}">
+                                <span class="sidebar-icon">
+                                    <i class="ri-dashboard-3-line"></i>
+                                </span>
+                                <span class="sidebar-label">Tableau de bord</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Gestion -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">GESTION</div>
+                    <ul class="sidebar-menu">
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('admin.employees_list') if 'admin.employees_list' in url_for else '#' }}" class="sidebar-link">
+                                <span class="sidebar-icon">
+                                    <i class="ri-team-line"></i>
+                                </span>
+                                <span class="sidebar-label">Employés</span>
+                                <span class="sidebar-badge">{{ employee_count|default(0) }}</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('crm.clients_list') if 'crm.clients_list' in url_for else '#' }}" class="sidebar-link">
+                                <span class="sidebar-icon">
+                                    <i class="ri-user-star-line"></i>
+                                </span>
+                                <span class="sidebar-label">Clients</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link">
+                                <span class="sidebar-icon">
+                                    <i class="ri-building-2-line"></i>
+                                </span>
+                                <span class="sidebar-label">Chantiers</span>
+                                <span class="badge badge-success ms-auto">Nouveau</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('crm.quotes_list') if 'crm.quotes_list' in url_for else '#' }}" class="sidebar-link">
+                                <span class="sidebar-icon">
+                                    <i class="ri-file-text-line"></i>
+                                </span>
+                                <span class="sidebar-label">Devis</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('crm.invoices_list') if 'crm.invoices_list' in url_for else '#' }}" class="sidebar-link">
+                                <span class="sidebar-icon">
+                                    <i class="ri-bill-line"></i>
+                                </span>
+                                <span class="sidebar-label">Factures</span>
+                                <span class="sidebar-badge">3</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link">
+                                <span class="sidebar-icon">
+                                    <i class="ri-user-add-line"></i>
+                                </span>
+                                <span class="sidebar-label">Leads</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Opérations -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">OPÉRATIONS</div>
+                    <ul class="sidebar-menu">
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('badge.index') if 'badge.index' in url_for else '#' }}" class="sidebar-link">
+                                <span class="sidebar-icon">
+                                    <i class="ri-qr-code-line"></i>
+                                </span>
+                                <span class="sidebar-label">Badges</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link">
+                                <span class="sidebar-icon">
+                                    <i class="ri-map-pin-2-line"></i>
+                                </span>
+                                <span class="sidebar-label">Carte</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link">
+                                <span class="sidebar-icon">
+                                    <i class="ri-tools-line"></i>
+                                </span>
+                                <span class="sidebar-label">Ressources</span>
+                                <span class="badge badge-warning ms-auto">2 alertes</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link">
+                                <span class="sidebar-icon">
+                                    <i class="ri-shield-check-line"></i>
+                                </span>
+                                <span class="sidebar-label">Sécurité</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Finance -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">FINANCE</div>
+                    <ul class="sidebar-menu">
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('admin.payroll_list') if 'admin.payroll_list' in url_for else '#' }}" class="sidebar-link">
+                                <span class="sidebar-icon">
+                                    <i class="ri-money-euro-circle-line"></i>
+                                </span>
+                                <span class="sidebar-label">Paie</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link">
+                                <span class="sidebar-icon">
+                                    <i class="ri-bar-chart-box-line"></i>
+                                </span>
+                                <span class="sidebar-label">Rapports</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link">
+                                <span class="sidebar-icon">
+                                    <i class="ri-calculator-line"></i>
+                                </span>
+                                <span class="sidebar-label">Budgets</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Administration -->
+                {% if current_user.has_permission('admin') if hasattr(current_user, 'has_permission') else True %}
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">ADMINISTRATION</div>
+                    <ul class="sidebar-menu">
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('admin.dashboard') if 'admin.dashboard' in url_for else '#' }}" class="sidebar-link">
+                                <span class="sidebar-icon">
+                                    <i class="ri-settings-3-line"></i>
+                                </span>
+                                <span class="sidebar-label">Paramètres</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link">
+                                <span class="sidebar-icon">
+                                    <i class="ri-user-settings-line"></i>
+                                </span>
+                                <span class="sidebar-label">Utilisateurs</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link">
+                                <span class="sidebar-icon">
+                                    <i class="ri-database-2-line"></i>
+                                </span>
+                                <span class="sidebar-label">Sauvegarde</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                {% endif %}
+            </nav>
+        </aside>
+        {% endif %}
+        
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Breadcrumb -->
+            {% block breadcrumb %}
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('main.dashboard') if current_user.is_authenticated else url_for('main.index') }}">Accueil</a></li>
+                    {% block breadcrumb_items %}{% endblock %}
+                </ol>
+            </nav>
+            {% endblock %}
+            
+            <!-- Page Header -->
+            {% block page_header %}
+            <div class="page-header mb-4">
+                <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+                <p class="page-description text-muted">{% block page_description %}{% endblock %}</p>
+            </div>
+            {% endblock %}
+            
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible animate-slideInDown" role="alert">
+                            <i class="ri-{% if category == 'success' %}checkbox-circle{% elif category == 'error' or category == 'danger' %}error-warning{% elif category == 'warning' %}alert{% else %}information{% endif %}-line me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <!-- Page Content -->
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    
+    <!-- Notification Panel -->
+    <div class="notification-panel" id="notificationPanel">
+        <div class="notification-header">
+            <h5>Notifications</h5>
+            <button class="btn btn-ghost btn-sm" id="closeNotifications">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+        <div class="notification-body">
+            <div class="notification-item">
+                <div class="notification-icon success">
+                    <i class="ri-check-line"></i>
+                </div>
+                <div class="notification-content">
+                    <p class="notification-title">Nouveau badge enregistré</p>
+                    <p class="notification-text">Jean Dupont a badgé à 08:15</p>
+                    <span class="notification-time">Il y a 5 min</span>
+                </div>
+            </div>
+            <div class="notification-item">
+                <div class="notification-icon warning">
+                    <i class="ri-alert-line"></i>
+                </div>
+                <div class="notification-content">
+                    <p class="notification-title">Maintenance requise</p>
+                    <p class="notification-text">La pelleteuse #3 nécessite une révision</p>
+                    <span class="notification-time">Il y a 2h</span>
+                </div>
+            </div>
+            <div class="notification-item">
+                <div class="notification-icon info">
+                    <i class="ri-information-line"></i>
+                </div>
+                <div class="notification-content">
+                    <p class="notification-title">Nouvelle facture</p>
+                    <p class="notification-text">Facture #2024-001 créée pour Client ABC</p>
+                    <span class="notification-time">Hier</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Theme Toggle
+        document.querySelectorAll('.theme-toggle button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const theme = this.dataset.theme;
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+                
+                document.querySelectorAll('.theme-toggle button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.querySelector(`.theme-toggle button[data-theme="${savedTheme}"]`).classList.add('active');
+        
+        // Sidebar Toggle
+        document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth <= 1024) {
+                sidebar.classList.toggle('show');
+            } else {
+                sidebar.classList.toggle('collapsed');
+            }
+        });
+        
+        // Global Search
+        document.getElementById('globalSearch')?.addEventListener('input', function(e) {
+            const query = e.target.value;
+            if (query.length > 2) {
+                // Implémenter la recherche globale
+                console.log('Recherche:', query);
+            }
+        });
+        
+        // Notifications
+        const notificationBtn = document.getElementById('notificationBtn');
+        const notificationPanel = document.getElementById('notificationPanel');
+        const closeNotifications = document.getElementById('closeNotifications');
+        
+        notificationBtn?.addEventListener('click', function() {
+            notificationPanel?.classList.add('show');
+        });
+        
+        closeNotifications?.addEventListener('click', function() {
+            notificationPanel?.classList.remove('show');
+        });
+        
+        // Close notification panel when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!notificationPanel?.contains(e.target) && !notificationBtn?.contains(e.target)) {
+                notificationPanel?.classList.remove('show');
+            }
+        });
+    </script>
+    
+    <!-- Additional CSS for notification panel -->
+    <style>
+        .notification-panel {
+            position: fixed;
+            top: var(--header-height);
+            right: 0;
+            width: 380px;
+            height: calc(100vh - var(--header-height));
+            background: var(--bg-primary);
+            border-left: 1px solid var(--border-color);
+            box-shadow: var(--shadow-xl);
+            transform: translateX(100%);
+            transition: transform var(--transition-base);
+            z-index: var(--z-fixed);
+            overflow-y: auto;
+        }
+        
+        .notification-panel.show {
+            transform: translateX(0);
+        }
+        
+        .notification-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .notification-header h5 {
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .notification-body {
+            padding: var(--spacing-lg);
+        }
+        
+        .notification-item {
+            display: flex;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .notification-item:hover {
+            background: var(--bg-tertiary);
+        }
+        
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .notification-icon.success {
+            background: var(--success-alpha);
+            color: var(--success);
+        }
+        
+        .notification-icon.warning {
+            background: var(--warning-alpha);
+            color: var(--warning);
+        }
+        
+        .notification-icon.info {
+            background: var(--info-alpha);
+            color: var(--info);
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            font-size: 0.95rem;
+        }
+        
+        .notification-text {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .notification-time {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+        
+        .breadcrumb {
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .breadcrumb-item {
+            font-size: 0.9rem;
+            color: var(--text-tertiary);
+        }
+        
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: '/';
+            padding: 0 var(--spacing-sm);
+            color: var(--text-muted);
+        }
+        
+        .breadcrumb-item.active {
+            color: var(--text-primary);
+        }
+        
+        .page-header {
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .page-description {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+        
+        .dropdown-menu {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-sm);
+        }
+        
+        .dropdown-item {
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            transition: all var(--transition-fast);
+        }
+        
+        .dropdown-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+        
+        .dropdown-divider {
+            margin: var(--spacing-sm) 0;
+            border-color: var(--border-color);
+        }
+        
+        .dropdown-header {
+            padding: var(--spacing-md);
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-alpha);
+            color: var(--primary);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        @media (max-width: 768px) {
+            .notification-panel {
+                width: 100%;
+            }
+        }
+    </style>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
