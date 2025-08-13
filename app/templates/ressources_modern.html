@@ -1,0 +1,603 @@
+{% extends "base_modern.html" %}
+
+{% block title %}Ressources - Globibat CRM{% endblock %}
+{% block page_title %}Gestion des Ressources{% endblock %}
+{% block page_description %}Inventaire du matériel et suivi de maintenance{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <!-- Barre d'actions -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex gap-2">
+                <div class="input-group" style="width: 300px;">
+                    <span class="input-group-text">
+                        <i class="ri-search-line"></i>
+                    </span>
+                    <input type="text" class="form-control" id="searchMateriel" placeholder="Rechercher du matériel...">
+                </div>
+                <select class="form-select" style="width: 150px;" id="filterCategorie">
+                    <option value="">Toutes catégories</option>
+                    <option value="Véhicules">Véhicules</option>
+                    <option value="Engins">Engins</option>
+                    <option value="Outillage">Outillage</option>
+                    <option value="Consommables">Consommables</option>
+                </select>
+                <select class="form-select" style="width: 150px;" id="filterStatut">
+                    <option value="">Tous statuts</option>
+                    <option value="Disponible">Disponible</option>
+                    <option value="En service">En service</option>
+                    <option value="Maintenance">En maintenance</option>
+                    <option value="Hors service">Hors service</option>
+                </select>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-warning" onclick="showMaintenances()">
+                    <i class="ri-tools-line"></i> Maintenances ({{ maintenances_count|default(0) }})
+                </button>
+                <button class="btn btn-primary" onclick="openMaterielModal()">
+                    <i class="ri-add-line"></i> Nouveau matériel
+                </button>
+            </div>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="avatar-sm bg-primary-soft text-primary rounded-circle">
+                                    <i class="ri-tools-fill fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h3 class="mb-0">{{ total_materiel|default(0) }}</h3>
+                                <p class="text-muted mb-0">Total matériel</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="avatar-sm bg-success-soft text-success rounded-circle">
+                                    <i class="ri-checkbox-circle-line fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h3 class="mb-0">{{ disponible_count|default(0) }}</h3>
+                                <p class="text-muted mb-0">Disponibles</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="avatar-sm bg-warning-soft text-warning rounded-circle">
+                                    <i class="ri-alert-line fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h3 class="mb-0">{{ maintenance_count|default(0) }}</h3>
+                                <p class="text-muted mb-0">En maintenance</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="avatar-sm bg-info-soft text-info rounded-circle">
+                                    <i class="ri-money-euro-circle-line fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h3 class="mb-0">{{ valeur_totale|format_currency }}</h3>
+                                <p class="text-muted mb-0">Valeur totale</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglets -->
+        <ul class="nav nav-tabs mb-4" id="resourceTabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#inventaire">
+                    <i class="ri-list-check"></i> Inventaire
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#maintenance">
+                    <i class="ri-tools-line"></i> Maintenance
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#consommables">
+                    <i class="ri-archive-line"></i> Consommables
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#reservations">
+                    <i class="ri-calendar-check-line"></i> Réservations
+                </a>
+            </li>
+        </ul>
+
+        <!-- Contenu des onglets -->
+        <div class="tab-content">
+            <!-- Onglet Inventaire -->
+            <div class="tab-pane fade show active" id="inventaire">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="materielTable">
+                                <thead>
+                                    <tr>
+                                        <th width="40">
+                                            <input class="form-check-input" type="checkbox" id="selectAll">
+                                        </th>
+                                        <th>Code</th>
+                                        <th>Désignation</th>
+                                        <th>Catégorie</th>
+                                        <th>Marque/Modèle</th>
+                                        <th>N° Série</th>
+                                        <th>Localisation</th>
+                                        <th>État</th>
+                                        <th>Statut</th>
+                                        <th>Valeur</th>
+                                        <th width="100">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for materiel in materiels %}
+                                    <tr data-id="{{ materiel.id }}">
+                                        <td>
+                                            <input class="form-check-input row-check" type="checkbox" value="{{ materiel.id }}">
+                                        </td>
+                                        <td><span class="badge badge-light">{{ materiel.code }}</span></td>
+                                        <td>
+                                            <div>
+                                                <h6 class="mb-0">{{ materiel.designation }}</h6>
+                                                <small class="text-muted">{{ materiel.description|truncate(50) }}</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-secondary">{{ materiel.categorie }}</span>
+                                        </td>
+                                        <td>{{ materiel.marque }} {{ materiel.modele }}</td>
+                                        <td>{{ materiel.numero_serie|default('-') }}</td>
+                                        <td>
+                                            {% if materiel.chantier %}
+                                            <i class="ri-building-line"></i> {{ materiel.chantier.nom }}
+                                            {% else %}
+                                            <i class="ri-home-line"></i> Dépôt
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar {% if materiel.etat >= 80 %}bg-success{% elif materiel.etat >= 50 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                                     style="width: {{ materiel.etat }}%">
+                                                    {{ materiel.etat }}%
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if materiel.statut == 'Disponible' %}
+                                                <span class="badge badge-success">{{ materiel.statut }}</span>
+                                            {% elif materiel.statut == 'En service' %}
+                                                <span class="badge badge-primary">{{ materiel.statut }}</span>
+                                            {% elif materiel.statut == 'Maintenance' %}
+                                                <span class="badge badge-warning">{{ materiel.statut }}</span>
+                                            {% else %}
+                                                <span class="badge badge-danger">{{ materiel.statut }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td><strong>{{ materiel.valeur|format_currency }}</strong></td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown">
+                                                    <i class="ri-more-2-fill"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li>
+                                                        <a class="dropdown-item" href="#" onclick="viewMateriel({{ materiel.id }})">
+                                                            <i class="ri-eye-line me-2"></i> Voir détails
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item" href="#" onclick="editMateriel({{ materiel.id }})">
+                                                            <i class="ri-edit-line me-2"></i> Modifier
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item" href="#" onclick="reserveMateriel({{ materiel.id }})">
+                                                            <i class="ri-calendar-check-line me-2"></i> Réserver
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item" href="#" onclick="addMaintenance({{ materiel.id }})">
+                                                            <i class="ri-tools-line me-2"></i> Maintenance
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item" href="#" onclick="generateQR({{ materiel.id }})">
+                                                            <i class="ri-qr-code-line me-2"></i> Générer QR
+                                                        </a>
+                                                    </li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li>
+                                                        <a class="dropdown-item text-danger" href="#" onclick="deleteMateriel({{ materiel.id }})">
+                                                            <i class="ri-delete-bin-line me-2"></i> Supprimer
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Onglet Maintenance -->
+            <div class="tab-pane fade" id="maintenance">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Planning de maintenance</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Matériel</th>
+                                        <th>Type</th>
+                                        <th>Date prévue</th>
+                                        <th>Intervenant</th>
+                                        <th>Coût estimé</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for maintenance in maintenances %}
+                                    <tr>
+                                        <td>{{ maintenance.materiel.designation }}</td>
+                                        <td>{{ maintenance.type_maintenance }}</td>
+                                        <td>{{ maintenance.date_prevue|date('d/m/Y') }}</td>
+                                        <td>{{ maintenance.intervenant|default('-') }}</td>
+                                        <td>{{ maintenance.cout_estime|format_currency }}</td>
+                                        <td>
+                                            {% if maintenance.statut == 'Planifiée' %}
+                                                <span class="badge badge-info">{{ maintenance.statut }}</span>
+                                            {% elif maintenance.statut == 'En cours' %}
+                                                <span class="badge badge-warning">{{ maintenance.statut }}</span>
+                                            {% else %}
+                                                <span class="badge badge-success">{{ maintenance.statut }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-light" onclick="editMaintenance({{ maintenance.id }})">
+                                                <i class="ri-edit-line"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Onglet Consommables -->
+            <div class="tab-pane fade" id="consommables">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Stock consommables</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for consommable in consommables %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card border {% if consommable.stock_actuel < consommable.stock_minimum %}border-danger{% else %}border-success{% endif %}">
+                                    <div class="card-body">
+                                        <h6 class="card-title">{{ consommable.designation }}</h6>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span>Stock actuel:</span>
+                                            <strong>{{ consommable.stock_actuel }} {{ consommable.unite }}</strong>
+                                        </div>
+                                        <div class="progress mb-2" style="height: 10px;">
+                                            <div class="progress-bar {% if consommable.stock_actuel < consommable.stock_minimum %}bg-danger{% else %}bg-success{% endif %}" 
+                                                 style="width: {{ (consommable.stock_actuel / consommable.stock_maximum * 100)|round }}%"></div>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <small>Min: {{ consommable.stock_minimum }}</small>
+                                            <small>Max: {{ consommable.stock_maximum }}</small>
+                                        </div>
+                                        {% if consommable.stock_actuel < consommable.stock_minimum %}
+                                        <button class="btn btn-danger btn-sm mt-2 w-100" onclick="reorderConsommable({{ consommable.id }})">
+                                            <i class="ri-shopping-cart-line"></i> Commander
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Onglet Réservations -->
+            <div class="tab-pane fade" id="reservations">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Calendrier des réservations</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="calendar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Matériel -->
+<div class="modal fade" id="materielModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="materielModalTitle">Nouveau Matériel</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="materielForm">
+                    <input type="hidden" name="id" id="materielId">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Code <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="code" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Catégorie <span class="text-danger">*</span></label>
+                                <select class="form-select" name="categorie" required>
+                                    <option value="Véhicules">Véhicules</option>
+                                    <option value="Engins">Engins</option>
+                                    <option value="Outillage">Outillage</option>
+                                    <option value="Consommables">Consommables</option>
+                                    <option value="Autre">Autre</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Désignation <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="designation" required>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Marque</label>
+                                <input type="text" class="form-control" name="marque">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Modèle</label>
+                                <input type="text" class="form-control" name="modele">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">N° Série</label>
+                                <input type="text" class="form-control" name="numero_serie">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Date d'achat</label>
+                                <input type="date" class="form-control" name="date_achat">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Valeur d'achat</label>
+                                <input type="number" class="form-control" name="valeur" step="0.01">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Statut</label>
+                                <select class="form-select" name="statut">
+                                    <option value="Disponible">Disponible</option>
+                                    <option value="En service">En service</option>
+                                    <option value="Maintenance">En maintenance</option>
+                                    <option value="Hors service">Hors service</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">État (%)</label>
+                                <input type="number" class="form-control" name="etat" min="0" max="100" value="100">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" onclick="saveMateriel()">
+                    <i class="ri-save-line"></i> Enregistrer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.avatar-sm {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bg-primary-soft { background-color: rgba(0, 91, 187, 0.1); }
+.bg-success-soft { background-color: rgba(39, 174, 96, 0.1); }
+.bg-warning-soft { background-color: rgba(255, 122, 0, 0.1); }
+.bg-info-soft { background-color: rgba(0, 174, 239, 0.1); }
+</style>
+
+<script>
+// Recherche et filtres
+document.getElementById('searchMateriel').addEventListener('input', filterTable);
+document.getElementById('filterCategorie').addEventListener('change', filterTable);
+document.getElementById('filterStatut').addEventListener('change', filterTable);
+
+function filterTable() {
+    const search = document.getElementById('searchMateriel').value.toLowerCase();
+    const categorie = document.getElementById('filterCategorie').value;
+    const statut = document.getElementById('filterStatut').value;
+    const rows = document.querySelectorAll('#materielTable tbody tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const categorieMatch = !categorie || row.cells[3].textContent.includes(categorie);
+        const statutMatch = !statut || row.cells[8].textContent.includes(statut);
+        const searchMatch = !search || text.includes(search);
+        
+        row.style.display = (categorieMatch && statutMatch && searchMatch) ? '' : 'none';
+    });
+}
+
+// Nouveau matériel
+function openMaterielModal() {
+    document.getElementById('materielModalTitle').textContent = 'Nouveau Matériel';
+    document.getElementById('materielForm').reset();
+    document.getElementById('materielId').value = '';
+    
+    // Générer code automatique
+    const code = 'MAT' + Date.now().toString().slice(-6);
+    document.querySelector('[name="code"]').value = code;
+    
+    new bootstrap.Modal(document.getElementById('materielModal')).show();
+}
+
+// Sauvegarder matériel
+function saveMateriel() {
+    const form = document.getElementById('materielForm');
+    const formData = new FormData(form);
+    const id = document.getElementById('materielId').value;
+    
+    const data = {};
+    formData.forEach((value, key) => {
+        data[key] = value;
+    });
+    
+    const url = id ? `/api/materiel/${id}` : '/api/materiel';
+    const method = id ? 'PUT' : 'POST';
+    
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'Erreur lors de l\'enregistrement');
+        }
+    });
+}
+
+// Supprimer matériel
+function deleteMateriel(id) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce matériel ?')) {
+        fetch(`/api/materiel/${id}`, { method: 'DELETE' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) location.reload();
+            });
+    }
+}
+
+// Réserver matériel
+function reserveMateriel(id) {
+    // Ouvrir modal de réservation
+    alert('Fonction de réservation à implémenter');
+}
+
+// Ajouter maintenance
+function addMaintenance(id) {
+    // Ouvrir modal de maintenance
+    alert('Fonction de maintenance à implémenter');
+}
+
+// Générer QR Code
+function generateQR(id) {
+    window.open(`/api/materiel/${id}/qrcode`, '_blank');
+}
+
+// Commander consommable
+function reorderConsommable(id) {
+    if (confirm('Lancer une commande pour ce consommable ?')) {
+        fetch(`/api/consommables/${id}/reorder`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message || 'Commande lancée');
+            });
+    }
+}
+
+// Afficher maintenances
+function showMaintenances() {
+    document.querySelector('[href="#maintenance"]').click();
+}
+</script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+{% endblock %}

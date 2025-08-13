@@ -1,0 +1,635 @@
+{% extends "base_modern.html" %}
+
+{% block title %}Tableau de bord{% endblock %}
+{% block page_title %}Tableau de bord{% endblock %}
+{% block page_description %}Vue d'ensemble de l'activité de Globibat{% endblock %}
+
+{% block content %}
+<!-- KPI Cards -->
+<div class="kpi-grid animate-slideInUp">
+    <!-- Employés actifs -->
+    <div class="kpi-card">
+        <div class="kpi-icon primary">
+            <i class="ri-team-line"></i>
+        </div>
+        <div class="kpi-content">
+            <div class="kpi-label">Employés actifs</div>
+            <div class="kpi-value">{{ stats.active_employees|default(42) }}</div>
+            <div class="kpi-change positive">
+                <i class="ri-arrow-up-line"></i>
+                <span>+3 ce mois</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Présents aujourd'hui -->
+    <div class="kpi-card">
+        <div class="kpi-icon success">
+            <i class="ri-user-smile-line"></i>
+        </div>
+        <div class="kpi-content">
+            <div class="kpi-label">Présents aujourd'hui</div>
+            <div class="kpi-value">{{ stats.present_today|default(38) }}</div>
+            <div class="kpi-change">
+                <span>90% de présence</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Badges du jour -->
+    <div class="kpi-card">
+        <div class="kpi-icon info">
+            <i class="ri-qr-scan-2-line"></i>
+        </div>
+        <div class="kpi-content">
+            <div class="kpi-label">Badges du jour</div>
+            <div class="kpi-value">{{ stats.badges_today|default(76) }}</div>
+            <div class="kpi-change">
+                <span>38 entrées, 38 sorties</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Anomalies détectées -->
+    <div class="kpi-card">
+        <div class="kpi-icon danger">
+            <i class="ri-error-warning-line"></i>
+        </div>
+        <div class="kpi-content">
+            <div class="kpi-label">Anomalies</div>
+            <div class="kpi-value">{{ stats.anomalies|default(3) }}</div>
+            <div class="kpi-change negative">
+                <i class="ri-arrow-up-line"></i>
+                <span>+2 depuis hier</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chantiers actifs -->
+    <div class="kpi-card">
+        <div class="kpi-icon warning">
+            <i class="ri-building-line"></i>
+        </div>
+        <div class="kpi-content">
+            <div class="kpi-label">Chantiers actifs</div>
+            <div class="kpi-value">{{ stats.active_projects|default(8) }}</div>
+            <div class="kpi-change">
+                <span>3 en retard</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Factures impayées -->
+    <div class="kpi-card">
+        <div class="kpi-icon warning">
+            <i class="ri-money-euro-circle-line"></i>
+        </div>
+        <div class="kpi-content">
+            <div class="kpi-label">Factures impayées</div>
+            <div class="kpi-value">CHF {{ "{:,.0f}".format(stats.unpaid_amount|default(125430)) }}</div>
+            <div class="kpi-change negative">
+                <span>5 factures en retard</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Grid -->
+<div class="dashboard-grid">
+    <!-- Statut des badges du jour -->
+    <div class="card animate-slideInLeft">
+        <div class="card-header">
+            <h3 class="card-title">Statut des badges du jour</h3>
+            <div class="card-actions">
+                <button class="btn btn-ghost btn-sm">
+                    <i class="ri-refresh-line"></i>
+                </button>
+                <button class="btn btn-ghost btn-sm">
+                    <i class="ri-more-2-fill"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Employé</th>
+                            <th>Chantier</th>
+                            <th>Entrée</th>
+                            <th>Sortie</th>
+                            <th>Durée</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for badge in recent_badges[:8]|default([]) %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar-sm">
+                                        <i class="ri-user-3-fill"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-500">{{ badge.employee_name|default('Jean Dupont') }}</div>
+                                        <small class="text-muted">{{ badge.role|default('Maçon') }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ badge.project|default('Chantier Genève Centre') }}</td>
+                            <td>{{ badge.entry_time|default('08:15') }}</td>
+                            <td>{{ badge.exit_time|default('17:30') }}</td>
+                            <td>{{ badge.duration|default('9h15') }}</td>
+                            <td>
+                                <span class="table-status {{ badge.status_class|default('active') }}">
+                                    <i class="ri-checkbox-circle-fill"></i>
+                                    {{ badge.status|default('Présent') }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% if not recent_badges %}
+                        <!-- Données de démonstration -->
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar-sm bg-primary text-white">JD</div>
+                                    <div>
+                                        <div class="fw-500">Jean Dupont</div>
+                                        <small class="text-muted">Maçon</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Chantier Genève Centre</td>
+                            <td>08:15</td>
+                            <td>17:30</td>
+                            <td>9h15</td>
+                            <td><span class="table-status active"><i class="ri-checkbox-circle-fill"></i> Présent</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar-sm bg-info text-white">PM</div>
+                                    <div>
+                                        <div class="fw-500">Pierre Martin</div>
+                                        <small class="text-muted">Chef de chantier</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Chantier Lausanne Ouest</td>
+                            <td>07:45</td>
+                            <td>-</td>
+                            <td>En cours</td>
+                            <td><span class="table-status active"><i class="ri-checkbox-circle-fill"></i> Présent</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar-sm bg-warning text-white">SR</div>
+                                    <div>
+                                        <div class="fw-500">Sophie Rochat</div>
+                                        <small class="text-muted">Architecte</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Bureau principal</td>
+                            <td>09:00</td>
+                            <td>12:30</td>
+                            <td>3h30</td>
+                            <td><span class="table-status pending"><i class="ri-time-line"></i> Pause déjeuner</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar-sm bg-danger text-white">LB</div>
+                                    <div>
+                                        <div class="fw-500">Luc Bernard</div>
+                                        <small class="text-muted">Électricien</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Chantier Fribourg Nord</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><span class="table-status inactive"><i class="ri-close-circle-fill"></i> Absent</span></td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer">
+            <a href="#" class="btn btn-primary btn-sm">
+                Voir tous les badges <i class="ri-arrow-right-line"></i>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Anomalies détectées -->
+    <div class="card animate-slideInRight">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="ri-error-warning-line text-danger"></i>
+                Anomalies détectées
+            </h3>
+            <span class="badge badge-danger">3</span>
+        </div>
+        <div class="card-body">
+            <div class="anomaly-list">
+                <div class="anomaly-item">
+                    <div class="anomaly-icon danger">
+                        <i class="ri-user-unfollow-line"></i>
+                    </div>
+                    <div class="anomaly-content">
+                        <h6>Badge manquant</h6>
+                        <p class="text-muted mb-1">Marc Favre n'a pas badgé ce matin</p>
+                        <small class="text-muted">Chantier Genève - Il y a 2h</small>
+                    </div>
+                    <button class="btn btn-ghost btn-sm">
+                        <i class="ri-arrow-right-s-line"></i>
+                    </button>
+                </div>
+                
+                <div class="anomaly-item">
+                    <div class="anomaly-icon warning">
+                        <i class="ri-time-line"></i>
+                    </div>
+                    <div class="anomaly-content">
+                        <h6>Retard inhabituel</h6>
+                        <p class="text-muted mb-1">5 employés en retard sur le chantier Lausanne</p>
+                        <small class="text-muted">Il y a 30 min</small>
+                    </div>
+                    <button class="btn btn-ghost btn-sm">
+                        <i class="ri-arrow-right-s-line"></i>
+                    </button>
+                </div>
+                
+                <div class="anomaly-item">
+                    <div class="anomaly-icon danger">
+                        <i class="ri-shield-cross-line"></i>
+                    </div>
+                    <div class="anomaly-content">
+                        <h6>Certificat de sécurité expiré</h6>
+                        <p class="text-muted mb-1">Paul Müller - CACES expiré depuis 3 jours</p>
+                        <small class="text-muted">Urgent</small>
+                    </div>
+                    <button class="btn btn-ghost btn-sm">
+                        <i class="ri-arrow-right-s-line"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Activité des chantiers -->
+    <div class="card animate-slideInUp">
+        <div class="card-header">
+            <h3 class="card-title">Activité des chantiers</h3>
+            <div class="tabs-mini">
+                <button class="tab-mini active" data-period="day">Jour</button>
+                <button class="tab-mini" data-period="week">Semaine</button>
+                <button class="tab-mini" data-period="month">Mois</button>
+            </div>
+        </div>
+        <div class="card-body">
+            <canvas id="projectActivityChart" height="300"></canvas>
+        </div>
+    </div>
+    
+    <!-- Dernières factures -->
+    <div class="card animate-slideInUp">
+        <div class="card-header">
+            <h3 class="card-title">Dernières factures</h3>
+            <a href="#" class="btn btn-primary btn-sm">
+                <i class="ri-add-line"></i> Nouvelle facture
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="invoice-list">
+                <div class="invoice-item">
+                    <div class="invoice-info">
+                        <h6 class="mb-1">#FAC-2024-001</h6>
+                        <p class="text-muted mb-0">Client ABC SA</p>
+                    </div>
+                    <div class="invoice-amount">
+                        <div class="text-end">
+                            <div class="fw-600">CHF 15,430</div>
+                            <span class="badge badge-success">Payée</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="invoice-item">
+                    <div class="invoice-info">
+                        <h6 class="mb-1">#FAC-2024-002</h6>
+                        <p class="text-muted mb-0">Immobilier XYZ</p>
+                    </div>
+                    <div class="invoice-amount">
+                        <div class="text-end">
+                            <div class="fw-600">CHF 42,750</div>
+                            <span class="badge badge-warning">En attente</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="invoice-item">
+                    <div class="invoice-info">
+                        <h6 class="mb-1">#FAC-2024-003</h6>
+                        <p class="text-muted mb-0">Construction Partners</p>
+                    </div>
+                    <div class="invoice-amount">
+                        <div class="text-end">
+                            <div class="fw-600">CHF 28,900</div>
+                            <span class="badge badge-danger">En retard</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Styles additionnels -->
+<style>
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-xl);
+}
+
+.dashboard-grid > .card:nth-child(3),
+.dashboard-grid > .card:nth-child(4) {
+    grid-column: 1 / -1;
+}
+
+.card-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.avatar-sm {
+    width: 36px;
+    height: 36px;
+    background: var(--primary-alpha);
+    color: var(--primary);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.fw-500 { font-weight: 500; }
+.fw-600 { font-weight: 600; }
+
+.anomaly-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.anomaly-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    cursor: pointer;
+}
+
+.anomaly-item:hover {
+    background: var(--bg-tertiary);
+    transform: translateX(4px);
+}
+
+.anomaly-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.anomaly-icon.danger {
+    background: var(--danger-alpha);
+    color: var(--danger);
+}
+
+.anomaly-icon.warning {
+    background: var(--warning-alpha);
+    color: var(--warning);
+}
+
+.anomaly-content {
+    flex: 1;
+}
+
+.anomaly-content h6 {
+    margin: 0 0 var(--spacing-xs) 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.anomaly-content p {
+    font-size: 0.875rem;
+}
+
+.tabs-mini {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.tab-mini {
+    padding: var(--spacing-xs) var(--spacing-md);
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.tab-mini:hover {
+    background: var(--bg-hover);
+}
+
+.tab-mini.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.invoice-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.invoice-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    cursor: pointer;
+}
+
+.invoice-item:hover {
+    background: var(--bg-tertiary);
+}
+
+.invoice-info h6 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.invoice-info p {
+    font-size: 0.875rem;
+}
+
+@media (max-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .kpi-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+    }
+}
+</style>
+
+<!-- JavaScript pour les graphiques -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Graphique d'activité des chantiers
+    const ctx = document.getElementById('projectActivityChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Genève Centre', 'Lausanne Ouest', 'Fribourg Nord', 'Sion Est', 'Neuchâtel', 'Yverdon'],
+                datasets: [
+                    {
+                        label: 'Employés présents',
+                        data: [12, 8, 6, 9, 5, 7],
+                        backgroundColor: 'rgba(0, 91, 187, 0.8)',
+                        borderColor: 'rgba(0, 91, 187, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8
+                    },
+                    {
+                        label: 'Heures travaillées',
+                        data: [96, 64, 48, 72, 40, 56],
+                        backgroundColor: 'rgba(39, 174, 96, 0.8)',
+                        borderColor: 'rgba(39, 174, 96, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        cornerRadius: 8,
+                        titleFont: {
+                            size: 14,
+                            weight: '600'
+                        },
+                        bodyFont: {
+                            size: 13
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 11
+                            }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            font: {
+                                size: 11
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Animation des KPI au scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+    
+    document.querySelectorAll('.kpi-card, .card').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        observer.observe(el);
+    });
+    
+    // Tabs mini
+    document.querySelectorAll('.tab-mini').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.tab-mini').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            // Ici vous pouvez ajouter la logique pour changer les données du graphique
+        });
+    });
+});
+</script>
+{% endblock %}
