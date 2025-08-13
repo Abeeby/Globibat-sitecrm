@@ -118,25 +118,45 @@ def employes():
 @modern_bp.route('/clients')
 def clients():
     """Gestion des clients"""
-    return render_template_string("""
-    {% extends "base_modern.html" %}
-    {% block title %}Clients{% endblock %}
-    {% block page_title %}Gestion des Clients{% endblock %}
-    {% block page_description %}Gérez votre portefeuille clients{% endblock %}
-    {% block content %}
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Liste des clients</h3>
-            <button class="btn btn-primary">
-                <i class="ri-user-add-line"></i> Nouveau client
-            </button>
+    try:
+        from app.models import Client, Chantier, Devis, StatutChantier
+        
+        # Récupérer tous les clients
+        clients = Client.query.all()
+        
+        # Calculer les statistiques
+        total_clients = len(clients)
+        active_projects = Chantier.query.filter_by(statut=StatutChantier.EN_COURS).count()
+        pending_quotes = Devis.query.filter_by(accepte=False).count()
+        
+        # Calculer le CA total
+        total_ca = sum(client.chiffre_affaires for client in clients)
+        
+        # Créer un filtre pour formater les montants
+        def format_currency(value):
+            if value is None:
+                return "0 €"
+            return f"{value:,.2f} €".replace(",", " ").replace(".", ",")
+        
+        return render_template('clients_modern.html',
+                             clients=clients,
+                             total_clients=total_clients,
+                             active_projects=active_projects,
+                             pending_quotes=pending_quotes,
+                             total_ca=total_ca,
+                             format_currency=format_currency)
+    except Exception as e:
+        print(f"Erreur dans la vue clients: {e}")
+        return render_template_string("""
+        {% extends "base_modern.html" %}
+        {% block title %}Clients{% endblock %}
+        {% block page_title %}Gestion des Clients{% endblock %}
+        {% block content %}
+        <div class="alert alert-warning">
+            <i class="ri-error-warning-line"></i> Erreur: {{ error }}
         </div>
-        <div class="card-body">
-            <p>Module de gestion des clients en cours de développement...</p>
-        </div>
-    </div>
-    {% endblock %}
-    """)
+        {% endblock %}
+        """, error=str(e))
 
 @modern_bp.route('/ressources')
 def ressources():
@@ -587,6 +607,238 @@ def api_chantier_detail(id):
     }
     
     return jsonify(chantier)
+
+# API Routes pour les Clients
+@modern_bp.route('/api/clients', methods=['GET', 'POST'])
+def api_clients():
+    """API pour gérer les clients"""
+    try:
+        from app.models import Client, db
+        
+        if request.method == 'POST':
+            data = request.get_json()
+            
+            # Créer un nouveau client
+            client = Client(
+                code_client=data.get('code_client'),
+                raison_sociale=data.get('raison_sociale'),
+                type_client=data.get('type_client'),
+                siret=data.get('siret'),
+                tva_intracommunautaire=data.get('tva_intracommunautaire'),
+                adresse=data.get('adresse'),
+                code_postal=data.get('code_postal'),
+                ville=data.get('ville'),
+                pays=data.get('pays', 'France'),
+                telephone=data.get('telephone'),
+                email=data.get('email'),
+                contact_principal=data.get('contact_principal'),
+                credit_limite=data.get('credit_limite'),
+                conditions_paiement=data.get('conditions_paiement'),
+                notes=data.get('notes'),
+                actif=data.get('actif', True)
+            )
+            
+            db.session.add(client)
+            db.session.commit()
+            
+            return jsonify({'success': True, 'id': client.id})
+        
+        # GET - Récupérer tous les clients
+        clients = Client.query.all()
+        return jsonify([{
+            'id': c.id,
+            'code_client': c.code_client,
+            'raison_sociale': c.raison_sociale,
+            'type_client': c.type_client,
+            'email': c.email,
+            'telephone': c.telephone,
+            'ville': c.ville,
+            'actif': c.actif
+        } for c in clients])
+    
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+
+@modern_bp.route('/api/clients/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+def api_client_detail(id):
+    """API pour un client spécifique"""
+    try:
+        from app.models import Client, db
+        
+        client = Client.query.get_or_404(id)
+        
+        if request.method == 'GET':
+            return jsonify({
+                'id': client.id,
+                'code_client': client.code_client,
+                'raison_sociale': client.raison_sociale,
+                'type_client': client.type_client,
+                'siret': client.siret,
+                'tva_intracommunautaire': client.tva_intracommunautaire,
+                'adresse': client.adresse,
+                'code_postal': client.code_postal,
+                'ville': client.ville,
+                'pays': client.pays,
+                'telephone': client.telephone,
+                'email': client.email,
+                'contact_principal': client.contact_principal,
+                'credit_limite': client.credit_limite,
+                'conditions_paiement': client.conditions_paiement,
+                'notes': client.notes,
+                'actif': client.actif
+            })
+        
+        elif request.method == 'PUT':
+            data = request.get_json()
+            
+            # Mettre à jour les champs
+            client.code_client = data.get('code_client', client.code_client)
+            client.raison_sociale = data.get('raison_sociale', client.raison_sociale)
+            client.type_client = data.get('type_client', client.type_client)
+            client.siret = data.get('siret', client.siret)
+            client.tva_intracommunautaire = data.get('tva_intracommunautaire', client.tva_intracommunautaire)
+            client.adresse = data.get('adresse', client.adresse)
+            client.code_postal = data.get('code_postal', client.code_postal)
+            client.ville = data.get('ville', client.ville)
+            client.pays = data.get('pays', client.pays)
+            client.telephone = data.get('telephone', client.telephone)
+            client.email = data.get('email', client.email)
+            client.contact_principal = data.get('contact_principal', client.contact_principal)
+            client.credit_limite = data.get('credit_limite', client.credit_limite)
+            client.conditions_paiement = data.get('conditions_paiement', client.conditions_paiement)
+            client.notes = data.get('notes', client.notes)
+            client.actif = data.get('actif', client.actif)
+            
+            db.session.commit()
+            return jsonify({'success': True})
+        
+        elif request.method == 'DELETE':
+            # Vérifier s'il y a des chantiers liés
+            if client.chantiers.count() > 0:
+                return jsonify({
+                    'success': False, 
+                    'message': 'Impossible de supprimer ce client car il a des chantiers associés'
+                }), 400
+            
+            db.session.delete(client)
+            db.session.commit()
+            return jsonify({'success': True})
+    
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+
+@modern_bp.route('/api/clients/export')
+def export_clients():
+    """Exporter les clients en CSV"""
+    try:
+        from app.models import Client
+        import csv
+        from io import StringIO
+        from flask import make_response
+        
+        # Créer le CSV
+        si = StringIO()
+        writer = csv.writer(si)
+        
+        # En-têtes
+        writer.writerow(['Code', 'Raison sociale', 'Type', 'Contact', 'Téléphone', 'Email', 'Ville', 'CA'])
+        
+        # Données
+        clients = Client.query.all()
+        for client in clients:
+            writer.writerow([
+                client.code_client,
+                client.raison_sociale,
+                client.type_client,
+                client.contact_principal,
+                client.telephone,
+                client.email,
+                client.ville,
+                client.chiffre_affaires
+            ])
+        
+        # Créer la réponse
+        output = make_response(si.getvalue())
+        output.headers["Content-Disposition"] = "attachment; filename=clients.csv"
+        output.headers["Content-type"] = "text/csv"
+        return output
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+# API Routes pour les Employés
+@modern_bp.route('/api/employes', methods=['GET', 'POST'])
+def api_employes():
+    """API pour gérer les employés"""
+    try:
+        from app.models import Employe, StatutEmploye, db
+        
+        if request.method == 'POST':
+            data = request.get_json() if request.is_json else request.form
+            
+            # Créer un nouvel employé
+            employe = Employe(
+                matricule=data.get('matricule'),
+                nom=data.get('nom'),
+                prenom=data.get('prenom'),
+                telephone=data.get('telephone'),
+                email=data.get('email'),
+                adresse=data.get('adresse'),
+                poste=data.get('poste'),
+                departement=data.get('departement'),
+                salaire_base=float(data.get('salaire_base', 0)),
+                statut=StatutEmploye[data.get('statut', 'ACTIF').upper().replace(' ', '_')],
+                permis_conduire=data.get('permis_conduire'),
+                caces=data.get('caces')
+            )
+            
+            db.session.add(employe)
+            db.session.commit()
+            
+            return jsonify({'success': True, 'id': employe.id})
+        
+        # GET - Récupérer tous les employés
+        employes = Employe.query.all()
+        return jsonify([{
+            'id': e.id,
+            'matricule': e.matricule,
+            'nom_complet': e.nom_complet,
+            'poste': e.poste,
+            'departement': e.departement,
+            'statut': e.statut.value if e.statut else 'Actif'
+        } for e in employes])
+    
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+
+@modern_bp.route('/api/employes/<int:id>', methods=['GET', 'DELETE'])
+def api_employe_detail(id):
+    """API pour un employé spécifique"""
+    try:
+        from app.models import Employe, db
+        
+        employe = Employe.query.get_or_404(id)
+        
+        if request.method == 'GET':
+            return jsonify({
+                'id': employe.id,
+                'matricule': employe.matricule,
+                'nom': employe.nom,
+                'prenom': employe.prenom,
+                'telephone': employe.telephone,
+                'email': employe.email,
+                'poste': employe.poste,
+                'departement': employe.departement,
+                'statut': employe.statut.value if employe.statut else 'Actif'
+            })
+        
+        elif request.method == 'DELETE':
+            db.session.delete(employe)
+            db.session.commit()
+            return jsonify({'success': True})
+    
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
 
 # Contexte global pour tous les templates
 @modern_bp.context_processor
