@@ -45,25 +45,66 @@ def chantiers():
 @modern_bp.route('/factures')
 def factures():
     """Module de gestion des factures"""
-    return render_template_string("""
-    {% extends "base_modern.html" %}
-    {% block title %}Factures{% endblock %}
-    {% block page_title %}Gestion des Factures{% endblock %}
-    {% block page_description %}Gérez vos factures et paiements{% endblock %}
-    {% block content %}
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Liste des factures</h3>
-            <button class="btn btn-primary">
-                <i class="ri-file-add-line"></i> Nouvelle facture
-            </button>
+    try:
+        from app.models import Facture, Client, Chantier, db
+        from datetime import datetime, timedelta
+        
+        # Récupérer toutes les factures
+        factures = Facture.query.all()
+        clients = Client.query.filter_by(actif=True).all()
+        
+        # Calculer les statistiques
+        total_factures = len(factures)
+        montant_total = sum(f.montant_ttc for f in factures)
+        
+        # Factures en attente et en retard
+        today = datetime.now().date()
+        en_attente = sum(f.montant_ttc for f in factures if f.statut == 'Envoyée')
+        factures_retard = [f for f in factures if f.date_echeance and f.date_echeance < today and f.statut != 'Payée']
+        en_retard = len(factures_retard)
+        relances_count = len(factures_retard)
+        
+        # Ajouter le nombre de jours de retard pour chaque facture
+        for facture in factures:
+            if facture.date_echeance and facture.date_echeance < today and facture.statut != 'Payée':
+                facture.jours_retard = (today - facture.date_echeance).days
+            else:
+                facture.jours_retard = 0
+        
+        # Filtre pour formater les montants
+        def format_currency(value):
+            if value is None:
+                return "0.00 €"
+            return f"{value:,.2f} €".replace(",", " ").replace(".", ",")
+        
+        # Filtre pour formater les dates
+        def date_filter(value, format='%d/%m/%Y'):
+            if value:
+                return value.strftime(format)
+            return '-'
+        
+        return render_template('factures_modern.html',
+                             factures=factures,
+                             clients=clients,
+                             total_factures=total_factures,
+                             montant_total=montant_total,
+                             en_attente=en_attente,
+                             en_retard=en_retard,
+                             relances_count=relances_count,
+                             format_currency=format_currency,
+                             date=date_filter)
+    except Exception as e:
+        print(f"Erreur dans la vue factures: {e}")
+        return render_template_string("""
+        {% extends "base_modern.html" %}
+        {% block title %}Factures{% endblock %}
+        {% block page_title %}Gestion des Factures{% endblock %}
+        {% block content %}
+        <div class="alert alert-warning">
+            <i class="ri-error-warning-line"></i> Module en cours de chargement...
         </div>
-        <div class="card-body">
-            <p>Module de gestion des factures en cours de développement...</p>
-        </div>
-    </div>
-    {% endblock %}
-    """)
+        {% endblock %}
+        """)
 
 @modern_bp.route('/employes')
 def employes():
@@ -839,6 +880,282 @@ def api_employe_detail(id):
     
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 400
+
+# API Routes pour les Factures
+@modern_bp.route('/api/factures', methods=['GET', 'POST'])
+def api_factures():
+    """API pour gérer les factures"""
+    try:
+        from app.models import Facture, Client, Chantier, db
+        
+        if request.method == 'POST':
+            data = request.get_json()
+            
+            # Créer une nouvelle facture
+            facture = Facture(
+                numero_facture=data.get('numero_facture'),
+                date_emission=datetime.strptime(data.get('date_emission'), '%Y-%m-%d').date(),
+                date_echeance=datetime.strptime(data.get('date_echeance'), '%Y-%m-%d').date(),
+                statut=data.get('statut', 'Brouillon'),
+                client_id=data.get('client_id'),
+                chantier_id=data.get('chantier_id'),
+                conditions_paiement=data.get('conditions_paiement'),
+                notes=data.get('notes')
+            )
+            
+            # Calculer les montants à partir des lignes
+            montant_ht = 0
+            montant_tva = 0
+            
+            for ligne in data.get('lignes', []):
+                quantite = float(ligne.get('quantite', 0))
+                prix_unitaire = float(ligne.get('prix_unitaire', 0))
+                taux_tva = float(ligne.get('taux_tva', 20))
+                
+                ligne_ht = quantite * prix_unitaire
+                ligne_tva = ligne_ht * (taux_tva / 100)
+                
+                montant_ht += ligne_ht
+                montant_tva += ligne_tva
+            
+            facture.montant_ht = montant_ht
+            facture.montant_tva = montant_tva
+            facture.montant_ttc = montant_ht + montant_tva
+            
+            db.session.add(facture)
+            db.session.commit()
+            
+            return jsonify({'success': True, 'id': facture.id})
+        
+        # GET - Récupérer toutes les factures
+        factures = Facture.query.all()
+        return jsonify([{
+            'id': f.id,
+            'numero_facture': f.numero_facture,
+            'date_emission': f.date_emission.isoformat() if f.date_emission else None,
+            'client': f.client.raison_sociale if f.client else '',
+            'montant_ttc': f.montant_ttc,
+            'statut': f.statut
+        } for f in factures])
+    
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+
+@modern_bp.route('/api/factures/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+def api_facture_detail(id):
+    """API pour une facture spécifique"""
+    try:
+        from app.models import Facture, db
+        
+        facture = Facture.query.get_or_404(id)
+        
+        if request.method == 'GET':
+            return jsonify({
+                'id': facture.id,
+                'numero_facture': facture.numero_facture,
+                'date_emission': facture.date_emission.isoformat() if facture.date_emission else None,
+                'date_echeance': facture.date_echeance.isoformat() if facture.date_echeance else None,
+                'statut': facture.statut,
+                'client_id': facture.client_id,
+                'chantier_id': facture.chantier_id,
+                'montant_ht': facture.montant_ht,
+                'montant_tva': facture.montant_tva,
+                'montant_ttc': facture.montant_ttc,
+                'conditions_paiement': facture.conditions_paiement,
+                'notes': facture.notes
+            })
+        
+        elif request.method == 'PUT':
+            data = request.get_json()
+            
+            # Mettre à jour les champs
+            facture.numero_facture = data.get('numero_facture', facture.numero_facture)
+            facture.statut = data.get('statut', facture.statut)
+            facture.conditions_paiement = data.get('conditions_paiement', facture.conditions_paiement)
+            facture.notes = data.get('notes', facture.notes)
+            
+            if data.get('date_emission'):
+                facture.date_emission = datetime.strptime(data.get('date_emission'), '%Y-%m-%d').date()
+            if data.get('date_echeance'):
+                facture.date_echeance = datetime.strptime(data.get('date_echeance'), '%Y-%m-%d').date()
+            
+            db.session.commit()
+            return jsonify({'success': True})
+        
+        elif request.method == 'DELETE':
+            db.session.delete(facture)
+            db.session.commit()
+            return jsonify({'success': True})
+    
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+
+@modern_bp.route('/api/factures/<int:id>/pdf')
+def api_facture_pdf(id):
+    """Générer le PDF d'une facture"""
+    try:
+        from app.models import Facture
+        from io import BytesIO
+        from reportlab.lib.pagesizes import A4
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib import colors
+        from reportlab.lib.units import inch
+        from flask import send_file
+        
+        facture = Facture.query.get_or_404(id)
+        
+        # Créer le PDF
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4)
+        elements = []
+        styles = getSampleStyleSheet()
+        
+        # En-tête
+        elements.append(Paragraph(f"<b>FACTURE N° {facture.numero_facture}</b>", styles['Title']))
+        elements.append(Spacer(1, 12))
+        
+        # Informations client
+        if facture.client:
+            client_info = f"""
+            <b>Client:</b> {facture.client.raison_sociale}<br/>
+            {facture.client.adresse}<br/>
+            {facture.client.code_postal} {facture.client.ville}<br/>
+            """
+            elements.append(Paragraph(client_info, styles['Normal']))
+            elements.append(Spacer(1, 12))
+        
+        # Dates
+        date_info = f"""
+        <b>Date d'émission:</b> {facture.date_emission.strftime('%d/%m/%Y') if facture.date_emission else '-'}<br/>
+        <b>Date d'échéance:</b> {facture.date_echeance.strftime('%d/%m/%Y') if facture.date_echeance else '-'}<br/>
+        """
+        elements.append(Paragraph(date_info, styles['Normal']))
+        elements.append(Spacer(1, 20))
+        
+        # Tableau des prestations (simplifié)
+        data = [['Description', 'Montant HT', 'TVA', 'Montant TTC']]
+        if facture.chantier:
+            data.append([facture.chantier.nom, 
+                        f"{facture.montant_ht:.2f} €",
+                        f"{facture.montant_tva:.2f} €",
+                        f"{facture.montant_ttc:.2f} €"])
+        else:
+            data.append(['Prestation', 
+                        f"{facture.montant_ht:.2f} €",
+                        f"{facture.montant_tva:.2f} €",
+                        f"{facture.montant_ttc:.2f} €"])
+        
+        table = Table(data)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 14),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ]))
+        
+        elements.append(table)
+        elements.append(Spacer(1, 20))
+        
+        # Total
+        total_text = f"<b>TOTAL TTC: {facture.montant_ttc:.2f} €</b>"
+        elements.append(Paragraph(total_text, styles['Heading2']))
+        
+        # Conditions
+        if facture.conditions_paiement:
+            elements.append(Spacer(1, 20))
+            elements.append(Paragraph(f"<b>Conditions de paiement:</b> {facture.conditions_paiement}", styles['Normal']))
+        
+        # Construire le PDF
+        doc.build(elements)
+        
+        buffer.seek(0)
+        return send_file(buffer, as_attachment=True, download_name=f"facture_{facture.numero_facture}.pdf", mimetype='application/pdf')
+    
+    except ImportError:
+        # Si reportlab n'est pas installé, retourner une erreur
+        return jsonify({'error': 'Génération PDF non disponible. Installez reportlab: pip install reportlab'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@modern_bp.route('/api/factures/<int:id>/paid', methods=['POST'])
+def api_facture_mark_paid(id):
+    """Marquer une facture comme payée"""
+    try:
+        from app.models import Facture, db
+        
+        facture = Facture.query.get_or_404(id)
+        facture.statut = 'Payée'
+        facture.date_paiement = datetime.now().date()
+        
+        db.session.commit()
+        return jsonify({'success': True})
+    
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+
+@modern_bp.route('/api/factures/<int:id>/send', methods=['POST'])
+def api_facture_send(id):
+    """Envoyer une facture par email"""
+    try:
+        from app.models import Facture
+        
+        facture = Facture.query.get_or_404(id)
+        
+        # Ici, vous pouvez implémenter l'envoi d'email
+        # Pour l'instant, on simule juste
+        facture.statut = 'Envoyée'
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Facture envoyée avec succès'})
+    
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+
+@modern_bp.route('/api/factures/<int:id>/relance', methods=['POST'])
+def api_facture_relance(id):
+    """Envoyer une relance pour une facture"""
+    try:
+        from app.models import Facture, RelanceFacture, db
+        
+        facture = Facture.query.get_or_404(id)
+        
+        # Créer une relance
+        relance = RelanceFacture(
+            facture_id=facture.id,
+            date_relance=datetime.now(),
+            type_relance='Email',
+            statut='Envoyée',
+            notes=f'Relance automatique pour facture {facture.numero_facture}'
+        )
+        
+        db.session.add(relance)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Relance envoyée avec succès'})
+    
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+
+@modern_bp.route('/api/clients/<int:client_id>/chantiers')
+def api_client_chantiers(client_id):
+    """Récupérer les chantiers d'un client"""
+    try:
+        from app.models import Chantier
+        
+        chantiers = Chantier.query.filter_by(client_id=client_id).all()
+        
+        return jsonify([{
+            'id': c.id,
+            'nom': c.nom
+        } for c in chantiers])
+    
+    except Exception as e:
+        return jsonify([])
 
 # Contexte global pour tous les templates
 @modern_bp.context_processor

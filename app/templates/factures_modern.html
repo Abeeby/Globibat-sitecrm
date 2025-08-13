@@ -1,0 +1,665 @@
+{% extends "base_modern.html" %}
+
+{% block title %}Factures - Globibat CRM{% endblock %}
+{% block page_title %}Gestion des Factures{% endblock %}
+{% block page_description %}Créez, gérez et suivez vos factures{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <!-- Barre d'actions -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex gap-2">
+                <div class="input-group" style="width: 300px;">
+                    <span class="input-group-text">
+                        <i class="ri-search-line"></i>
+                    </span>
+                    <input type="text" class="form-control" id="searchFactures" placeholder="Rechercher une facture...">
+                </div>
+                <select class="form-select" style="width: 150px;" id="filterStatus">
+                    <option value="">Tous statuts</option>
+                    <option value="Brouillon">Brouillon</option>
+                    <option value="Envoyée">Envoyée</option>
+                    <option value="Payée">Payée</option>
+                    <option value="En retard">En retard</option>
+                    <option value="Annulée">Annulée</option>
+                </select>
+                <select class="form-select" style="width: 150px;" id="filterPeriod">
+                    <option value="all">Toutes périodes</option>
+                    <option value="month">Ce mois</option>
+                    <option value="quarter">Ce trimestre</option>
+                    <option value="year">Cette année</option>
+                </select>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-warning" onclick="showRelances()">
+                    <i class="ri-alarm-warning-line"></i> Relances ({{ relances_count|default(0) }})
+                </button>
+                <button class="btn btn-secondary" onclick="exportFactures()">
+                    <i class="ri-download-line"></i> Exporter
+                </button>
+                <button class="btn btn-primary" onclick="openFactureModal()">
+                    <i class="ri-file-add-line"></i> Nouvelle facture
+                </button>
+            </div>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="avatar-sm bg-primary-soft text-primary rounded-circle">
+                                    <i class="ri-file-text-line fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h3 class="mb-0">{{ total_factures|default(0) }}</h3>
+                                <p class="text-muted mb-0">Total factures</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="avatar-sm bg-success-soft text-success rounded-circle">
+                                    <i class="ri-money-euro-circle-line fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h3 class="mb-0">{{ montant_total|format_currency }}</h3>
+                                <p class="text-muted mb-0">Montant total</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="avatar-sm bg-warning-soft text-warning rounded-circle">
+                                    <i class="ri-time-line fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h3 class="mb-0">{{ en_attente|format_currency }}</h3>
+                                <p class="text-muted mb-0">En attente</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="avatar-sm bg-danger-soft text-danger rounded-circle">
+                                    <i class="ri-alert-line fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h3 class="mb-0">{{ en_retard|default(0) }}</h3>
+                                <p class="text-muted mb-0">En retard</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tableau des factures -->
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="facturesTable">
+                        <thead>
+                            <tr>
+                                <th width="40">
+                                    <input class="form-check-input" type="checkbox" id="selectAll">
+                                </th>
+                                <th>N° Facture</th>
+                                <th>Date</th>
+                                <th>Client</th>
+                                <th>Chantier</th>
+                                <th>Montant HT</th>
+                                <th>TVA</th>
+                                <th>Montant TTC</th>
+                                <th>Échéance</th>
+                                <th>Statut</th>
+                                <th width="120">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for facture in factures %}
+                            <tr data-id="{{ facture.id }}">
+                                <td>
+                                    <input class="form-check-input row-check" type="checkbox" value="{{ facture.id }}">
+                                </td>
+                                <td>
+                                    <strong>{{ facture.numero_facture }}</strong>
+                                </td>
+                                <td>{{ facture.date_emission|date('d/m/Y') }}</td>
+                                <td>
+                                    <div>
+                                        <h6 class="mb-0">{{ facture.client.raison_sociale }}</h6>
+                                        <small class="text-muted">{{ facture.client.code_client }}</small>
+                                    </div>
+                                </td>
+                                <td>{{ facture.chantier.nom if facture.chantier else '-' }}</td>
+                                <td>{{ facture.montant_ht|format_currency }}</td>
+                                <td>{{ facture.montant_tva|format_currency }}</td>
+                                <td><strong>{{ facture.montant_ttc|format_currency }}</strong></td>
+                                <td>
+                                    {{ facture.date_echeance|date('d/m/Y') }}
+                                    {% if facture.jours_retard > 0 %}
+                                    <br><small class="text-danger">{{ facture.jours_retard }} jours de retard</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if facture.statut == 'Payée' %}
+                                        <span class="badge badge-success">{{ facture.statut }}</span>
+                                    {% elif facture.statut == 'En retard' %}
+                                        <span class="badge badge-danger">{{ facture.statut }}</span>
+                                    {% elif facture.statut == 'Envoyée' %}
+                                        <span class="badge badge-primary">{{ facture.statut }}</span>
+                                    {% elif facture.statut == 'Brouillon' %}
+                                        <span class="badge badge-secondary">{{ facture.statut }}</span>
+                                    {% else %}
+                                        <span class="badge badge-warning">{{ facture.statut }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown">
+                                            <i class="ri-more-2-fill"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item" href="#" onclick="viewFacture({{ facture.id }})">
+                                                    <i class="ri-eye-line me-2"></i> Voir
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="#" onclick="downloadPDF({{ facture.id }})">
+                                                    <i class="ri-file-pdf-line me-2"></i> Télécharger PDF
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="#" onclick="sendFacture({{ facture.id }})">
+                                                    <i class="ri-mail-send-line me-2"></i> Envoyer par email
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="#" onclick="editFacture({{ facture.id }})">
+                                                    <i class="ri-edit-line me-2"></i> Modifier
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="#" onclick="duplicateFacture({{ facture.id }})">
+                                                    <i class="ri-file-copy-line me-2"></i> Dupliquer
+                                                </a>
+                                            </li>
+                                            {% if facture.statut != 'Payée' %}
+                                            <li>
+                                                <a class="dropdown-item" href="#" onclick="markAsPaid({{ facture.id }})">
+                                                    <i class="ri-checkbox-circle-line me-2"></i> Marquer payée
+                                                </a>
+                                            </li>
+                                            {% endif %}
+                                            {% if facture.statut == 'En retard' %}
+                                            <li>
+                                                <a class="dropdown-item text-warning" href="#" onclick="sendRelance({{ facture.id }})">
+                                                    <i class="ri-alarm-warning-line me-2"></i> Envoyer relance
+                                                </a>
+                                            </li>
+                                            {% endif %}
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <a class="dropdown-item text-danger" href="#" onclick="deleteFacture({{ facture.id }})">
+                                                    <i class="ri-delete-bin-line me-2"></i> Supprimer
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Création/Édition Facture -->
+<div class="modal fade" id="factureModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="factureModalTitle">Nouvelle Facture</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="factureForm">
+                    <input type="hidden" name="id" id="factureId">
+                    
+                    <!-- Informations générales -->
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">N° Facture <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="numero_facture" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Date émission <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="date_emission" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Date échéance <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="date_echeance" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Statut</label>
+                                <select class="form-select" name="statut">
+                                    <option value="Brouillon">Brouillon</option>
+                                    <option value="Envoyée">Envoyée</option>
+                                    <option value="Payée">Payée</option>
+                                    <option value="En retard">En retard</option>
+                                    <option value="Annulée">Annulée</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Client <span class="text-danger">*</span></label>
+                                <select class="form-select" name="client_id" required onchange="updateChantiers()">
+                                    <option value="">Sélectionner un client</option>
+                                    {% for client in clients %}
+                                    <option value="{{ client.id }}">{{ client.raison_sociale }} ({{ client.code_client }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Chantier</label>
+                                <select class="form-select" name="chantier_id" id="chantierSelect">
+                                    <option value="">Sélectionner un chantier</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Lignes de facture -->
+                    <h6 class="mb-3 mt-4">Lignes de facture</h6>
+                    <div class="table-responsive">
+                        <table class="table" id="lignesTable">
+                            <thead>
+                                <tr>
+                                    <th width="40%">Description</th>
+                                    <th width="15%">Quantité</th>
+                                    <th width="15%">Prix unitaire HT</th>
+                                    <th width="10%">TVA %</th>
+                                    <th width="15%">Total HT</th>
+                                    <th width="5%"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="lignesBody">
+                                <tr class="ligne-facture">
+                                    <td>
+                                        <input type="text" class="form-control" name="description[]" placeholder="Description de la prestation">
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control" name="quantite[]" value="1" min="1" onchange="calculerLigne(this)">
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control" name="prix_unitaire[]" step="0.01" placeholder="0.00" onchange="calculerLigne(this)">
+                                    </td>
+                                    <td>
+                                        <select class="form-select" name="tva[]" onchange="calculerLigne(this)">
+                                            <option value="20">20%</option>
+                                            <option value="10">10%</option>
+                                            <option value="5.5">5.5%</option>
+                                            <option value="0">0%</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control total-ht" readonly>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="supprimerLigne(this)">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <button type="button" class="btn btn-secondary mb-3" onclick="ajouterLigne()">
+                        <i class="ri-add-line"></i> Ajouter une ligne
+                    </button>
+                    
+                    <!-- Totaux -->
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Conditions de paiement</label>
+                                <textarea class="form-control" name="conditions_paiement" rows="2">Paiement à 30 jours à réception de facture</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Notes</label>
+                                <textarea class="form-control" name="notes" rows="2"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Total HT:</span>
+                                        <strong id="totalHT">0.00 €</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>TVA:</span>
+                                        <strong id="totalTVA">0.00 €</strong>
+                                    </div>
+                                    <hr>
+                                    <div class="d-flex justify-content-between">
+                                        <h5>Total TTC:</h5>
+                                        <h5 id="totalTTC">0.00 €</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-info" onclick="saveFacture(true)">
+                    <i class="ri-file-pdf-line"></i> Enregistrer et générer PDF
+                </button>
+                <button type="button" class="btn btn-primary" onclick="saveFacture(false)">
+                    <i class="ri-save-line"></i> Enregistrer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.avatar-sm {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bg-primary-soft { background-color: rgba(0, 91, 187, 0.1); }
+.bg-success-soft { background-color: rgba(39, 174, 96, 0.1); }
+.bg-warning-soft { background-color: rgba(255, 122, 0, 0.1); }
+.bg-danger-soft { background-color: rgba(220, 53, 69, 0.1); }
+</style>
+
+<script>
+// Variables globales
+let currentFactureId = null;
+
+// Recherche et filtres
+document.getElementById('searchFactures').addEventListener('input', filterTable);
+document.getElementById('filterStatus').addEventListener('change', filterTable);
+document.getElementById('filterPeriod').addEventListener('change', filterTable);
+
+function filterTable() {
+    const search = document.getElementById('searchFactures').value.toLowerCase();
+    const status = document.getElementById('filterStatus').value;
+    const period = document.getElementById('filterPeriod').value;
+    const rows = document.querySelectorAll('#facturesTable tbody tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const statusMatch = !status || row.cells[9].textContent.includes(status);
+        const searchMatch = !search || text.includes(search);
+        
+        row.style.display = (statusMatch && searchMatch) ? '' : 'none';
+    });
+}
+
+// Nouvelle facture
+function openFactureModal() {
+    currentFactureId = null;
+    document.getElementById('factureModalTitle').textContent = 'Nouvelle Facture';
+    document.getElementById('factureForm').reset();
+    document.getElementById('factureId').value = '';
+    
+    // Générer numéro automatique
+    const date = new Date();
+    const numero = `F${date.getFullYear()}${String(date.getMonth()+1).padStart(2,'0')}${Math.floor(Math.random()*1000)}`;
+    document.querySelector('[name="numero_facture"]').value = numero;
+    document.querySelector('[name="date_emission"]').value = date.toISOString().split('T')[0];
+    
+    // Date échéance à 30 jours
+    const echeance = new Date(date);
+    echeance.setDate(echeance.getDate() + 30);
+    document.querySelector('[name="date_echeance"]').value = echeance.toISOString().split('T')[0];
+    
+    new bootstrap.Modal(document.getElementById('factureModal')).show();
+}
+
+// Ajouter ligne de facture
+function ajouterLigne() {
+    const tbody = document.getElementById('lignesBody');
+    const newRow = tbody.querySelector('tr').cloneNode(true);
+    
+    // Réinitialiser les valeurs
+    newRow.querySelectorAll('input').forEach(input => {
+        if (input.type === 'number' && input.name === 'quantite[]') {
+            input.value = 1;
+        } else {
+            input.value = '';
+        }
+    });
+    
+    tbody.appendChild(newRow);
+}
+
+// Supprimer ligne
+function supprimerLigne(btn) {
+    const tbody = document.getElementById('lignesBody');
+    if (tbody.children.length > 1) {
+        btn.closest('tr').remove();
+        calculerTotaux();
+    }
+}
+
+// Calculer ligne
+function calculerLigne(element) {
+    const row = element.closest('tr');
+    const quantite = parseFloat(row.querySelector('[name="quantite[]"]').value) || 0;
+    const prixUnit = parseFloat(row.querySelector('[name="prix_unitaire[]"]').value) || 0;
+    const totalHT = quantite * prixUnit;
+    
+    row.querySelector('.total-ht').value = totalHT.toFixed(2);
+    calculerTotaux();
+}
+
+// Calculer totaux
+function calculerTotaux() {
+    let totalHT = 0;
+    let totalTVA = 0;
+    
+    document.querySelectorAll('#lignesBody tr').forEach(row => {
+        const quantite = parseFloat(row.querySelector('[name="quantite[]"]').value) || 0;
+        const prixUnit = parseFloat(row.querySelector('[name="prix_unitaire[]"]').value) || 0;
+        const tauxTVA = parseFloat(row.querySelector('[name="tva[]"]').value) || 0;
+        
+        const ligneHT = quantite * prixUnit;
+        const ligneTVA = ligneHT * (tauxTVA / 100);
+        
+        totalHT += ligneHT;
+        totalTVA += ligneTVA;
+    });
+    
+    const totalTTC = totalHT + totalTVA;
+    
+    document.getElementById('totalHT').textContent = totalHT.toFixed(2) + ' €';
+    document.getElementById('totalTVA').textContent = totalTVA.toFixed(2) + ' €';
+    document.getElementById('totalTTC').textContent = totalTTC.toFixed(2) + ' €';
+}
+
+// Mettre à jour chantiers selon client
+function updateChantiers() {
+    const clientId = document.querySelector('[name="client_id"]').value;
+    const select = document.getElementById('chantierSelect');
+    
+    if (clientId) {
+        fetch(`/api/clients/${clientId}/chantiers`)
+            .then(response => response.json())
+            .then(data => {
+                select.innerHTML = '<option value="">Sélectionner un chantier</option>';
+                data.forEach(chantier => {
+                    select.innerHTML += `<option value="${chantier.id}">${chantier.nom}</option>`;
+                });
+            });
+    }
+}
+
+// Sauvegarder facture
+function saveFacture(generatePDF) {
+    const form = document.getElementById('factureForm');
+    const formData = new FormData(form);
+    const id = document.getElementById('factureId').value;
+    
+    // Collecter les lignes
+    const lignes = [];
+    document.querySelectorAll('#lignesBody tr').forEach(row => {
+        const description = row.querySelector('[name="description[]"]').value;
+        if (description) {
+            lignes.push({
+                description: description,
+                quantite: row.querySelector('[name="quantite[]"]').value,
+                prix_unitaire: row.querySelector('[name="prix_unitaire[]"]').value,
+                taux_tva: row.querySelector('[name="tva[]"]').value
+            });
+        }
+    });
+    
+    const data = {
+        numero_facture: formData.get('numero_facture'),
+        date_emission: formData.get('date_emission'),
+        date_echeance: formData.get('date_echeance'),
+        statut: formData.get('statut'),
+        client_id: formData.get('client_id'),
+        chantier_id: formData.get('chantier_id'),
+        conditions_paiement: formData.get('conditions_paiement'),
+        notes: formData.get('notes'),
+        lignes: lignes
+    };
+    
+    const url = id ? `/api/factures/${id}` : '/api/factures';
+    const method = id ? 'PUT' : 'POST';
+    
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (generatePDF) {
+                downloadPDF(data.id);
+            }
+            location.reload();
+        } else {
+            alert(data.message || 'Erreur lors de l\'enregistrement');
+        }
+    });
+}
+
+// Télécharger PDF
+function downloadPDF(id) {
+    window.open(`/api/factures/${id}/pdf`, '_blank');
+}
+
+// Envoyer par email
+function sendFacture(id) {
+    if (confirm('Envoyer la facture par email au client ?')) {
+        fetch(`/api/factures/${id}/send`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message || 'Facture envoyée');
+            });
+    }
+}
+
+// Marquer comme payée
+function markAsPaid(id) {
+    if (confirm('Marquer cette facture comme payée ?')) {
+        fetch(`/api/factures/${id}/paid`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) location.reload();
+            });
+    }
+}
+
+// Supprimer facture
+function deleteFacture(id) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette facture ?')) {
+        fetch(`/api/factures/${id}`, { method: 'DELETE' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) location.reload();
+            });
+    }
+}
+
+// Envoyer relance
+function sendRelance(id) {
+    if (confirm('Envoyer une relance pour cette facture ?')) {
+        fetch(`/api/factures/${id}/relance`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message || 'Relance envoyée');
+            });
+    }
+}
+
+// Afficher les relances
+function showRelances() {
+    window.location.href = '/modern/factures?filter=relances';
+}
+
+// Exporter factures
+function exportFactures() {
+    window.location.href = '/api/factures/export';
+}
+</script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+{% endblock %}
