@@ -1,71 +1,209 @@
-# Python
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
-.Python
-venv/
-env/
-ENV/
-.venv
 
-# Flask
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
 instance/
 .webassets-cache
 
-# Database
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Globibat specific
+instance/
+logs/
 *.db
 *.sqlite
 *.sqlite3
+app/static/uploads/
+!app/static/uploads/.gitkeep
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
+# Sensitive files
+config_prod.py
+secrets.txt
+*.pem
+*.key
+*.crt
+*.pfx
+
+# Backup files
+*.bak
+*.backup
+*.old
 *~
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# Environment
-.env
-.env.*
-.env.local
-.env.production
-env_configuration.txt
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
 
-# Logs
-*.log
-logs/
+# Reports and exports
+*.xlsx
+*.xls
+*.pdf
+*.csv
+exports/
+reports/
 
-# Static files
-static/rapport_*.xlsx
-static/exports/
-app/static/uploads/
-
-# Backup
-backup/
-backups/
-*.bak
-*.sql
+# Node modules (if using any JS)
+node_modules/
+package-lock.json
+yarn.lock
 
 # Testing
 .pytest_cache/
 .coverage
 htmlcov/
+test_*.db
 
-# Documentation temporaire
-*.tmp
-*.temp
+# Documentation builds
+docs/_build/
+site/
 
-# Secrets
-*.key
-*.pem
-secret_*
+# Archive files
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
 
-# Fichiers spécifiques Hostinger
-index.py
-.htaccess
-maintenance.sh 
+# Custom ignore
+TODO.txt
+NOTES.txt
+credentials.txt
+passwords.txt 

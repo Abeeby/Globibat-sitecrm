@@ -45,8 +45,8 @@ class Client(db.Model):
     # Informations commerciales
     lead_source = db.Column(db.String(50))  # Site web, Recommandation, etc.
     industry = db.Column(db.String(50))
-    revenue_potential = db.Column(db.Decimal(10, 2))
-    credit_limit = db.Column(db.Decimal(10, 2))
+    revenue_potential = db.Column(db.Float)
+    credit_limit = db.Column(db.Float)
     payment_terms = db.Column(db.Integer, default=30)  # Jours
     
     # Préférences

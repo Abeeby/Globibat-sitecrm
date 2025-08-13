@@ -2,9 +2,9 @@
 Application principale Globibat CRM avec système de badgage avancé
 """
 
-from flask import Flask
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_mail import Mail
@@ -12,6 +12,7 @@ from config import Config
 import logging
 from logging.handlers import RotatingFileHandler
 import os
+from datetime import datetime
 
 # Extensions Flask
 db = SQLAlchemy()
@@ -57,17 +58,16 @@ def create_app(config_class=Config):
     app.register_blueprint(analytics_bp)
     
     # Créer les dossiers nécessaires
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    os.makedirs(app.config.get('UPLOAD_FOLDER', 'app/static/uploads'), exist_ok=True)
     os.makedirs('app/static/uploads/attendance', exist_ok=True)
     os.makedirs('app/static/uploads/expenses', exist_ok=True)
     os.makedirs('app/static/uploads/documents', exist_ok=True)
+    os.makedirs('app/static/uploads/avatars', exist_ok=True)
     os.makedirs('instance', exist_ok=True)
+    os.makedirs('logs', exist_ok=True)
     
     # Configuration des logs
     if not app.debug and not app.testing:
-        if not os.path.exists('logs'):
-            os.mkdir('logs')
-        
         file_handler = RotatingFileHandler(
             'logs/globibat.log',
             maxBytes=10240000,
@@ -86,22 +86,16 @@ def create_app(config_class=Config):
     @app.context_processor
     def inject_globals():
         """Injecter des variables globales dans tous les templates"""
-        from app.models import Notification
-        from app.utils.permissions import ROLES, PermissionManager
-        
-        unread_count = 0
-        if current_user.is_authenticated:
-            unread_count = Notification.query.filter_by(
-                user_id=current_user.id,
-                is_read=False
-            ).count()
-        
         return dict(
-            unread_notifications=unread_count,
-            roles=ROLES,
-            has_permission=PermissionManager.has_permission,
             company_name='Globibat SA',
-            current_year=datetime.now().year
+            current_year=datetime.now().year,
+            site_sections={
+                'main': 'Site Internet',
+                'crm': 'CRM',
+                'admin': 'Administration',
+                'employee': 'Espace Employé',
+                'badge': 'Système Badge'
+            }
         )
     
     # Filtres Jinja2 personnalisés
@@ -110,6 +104,17 @@ def create_app(config_class=Config):
         """Formater une datetime"""
         if value is None:
             return ''
+        if isinstance(value, str):
+            return value
+        return value.strftime(format)
+    
+    @app.template_filter('date')
+    def date_filter(value, format='%d/%m/%Y'):
+        """Formater une date"""
+        if value is None:
+            return ''
+        if isinstance(value, str):
+            return value
         return value.strftime(format)
     
     @app.template_filter('currency')
@@ -140,11 +145,6 @@ def create_app(config_class=Config):
         db.session.rollback()
         return render_template('errors/500.html'), 500
     
-    # Tâches planifiées
-    with app.app_context():
-        from app.utils.scheduler import start_scheduler
-        start_scheduler(app)
-    
     # Commandes CLI personnalisées
     @app.cli.command()
     def init_db():
@@ -153,59 +153,29 @@ def create_app(config_class=Config):
         print("Base de données initialisée.")
     
     @app.cli.command()
-    def create_admin():
-        """Créer un compte administrateur"""
-        from app.models import User
-        from getpass import getpass
+    def reset_admin():
+        """Réinitialiser le mot de passe admin"""
+        from app.models.user import User
         
-        email = input("Email de l'admin: ")
-        password = getpass("Mot de passe: ")
-        
-        admin = User(
-            email=email,
-            first_name='Admin',
-            last_name='Globibat',
-            role='admin',
-            is_active=True
-        )
-        admin.set_password(password)
-        
-        db.session.add(admin)
-        db.session.commit()
-        
-        print(f"Admin créé: {email}")
+        admin = User.query.filter_by(email='info@globibat.com').first()
+        if admin:
+            admin.set_password('Miser1597532684!')
+            db.session.commit()
+            print("Mot de passe admin réinitialisé")
+        else:
+            print("Admin non trouvé. Exécutez d'abord init_database.py")
     
     @app.cli.command()
-    def init_data():
-        """Initialiser les données de base"""
-        from app.utils.init_data import initialize_base_data
-        initialize_base_data()
-        print("Données de base initialisées.")
-    
-    @app.cli.command()
-    def check_compliance():
-        """Vérifier la conformité du jour"""
-        from app.utils.compliance import compliance_checker
-        from datetime import date
-        
-        result = compliance_checker.check_daily_compliance(date.today())
-        print(f"Violations: {len(result['violations'])}")
-        print(f"Avertissements: {len(result['warnings'])}")
-        
-        for violation in result['violations']:
-            print(f"- {violation['message']}")
-    
-    @app.cli.command()
-    def send_reminders():
-        """Envoyer les rappels automatiques"""
-        from app.utils.notifications import notification_service
-        notification_service.check_and_send_reminders()
-        print("Rappels envoyés.")
+    def create_test_data():
+        """Créer des données de test"""
+        from init_database import init_database
+        init_database()
+        print("Données de test créées.")
     
     return app
 
 # Callback pour Flask-Login
 @login_manager.user_loader
 def load_user(user_id):
-    from app.models import User
+    from app.models.user import User
     return User.query.get(int(user_id))
