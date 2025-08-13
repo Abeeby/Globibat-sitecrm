@@ -68,25 +68,52 @@ def factures():
 @modern_bp.route('/employes')
 def employes():
     """Gestion des employés et RH"""
-    return render_template_string("""
-    {% extends "base_modern.html" %}
-    {% block title %}Employés{% endblock %}
-    {% block page_title %}Gestion des Employés{% endblock %}
-    {% block page_description %}Gérez vos équipes et ressources humaines{% endblock %}
-    {% block content %}
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Liste des employés</h3>
-            <button class="btn btn-primary">
-                <i class="ri-user-add-line"></i> Nouvel employé
-            </button>
+    try:
+        # Importer les modèles
+        from app.models import Employe, StatutEmploye, Badge, TypeBadge
+        
+        # Récupérer tous les employés
+        employes = Employe.query.all()
+        
+        # Calculer les statistiques
+        total_employees = len(employes)
+        active_employees = Employe.query.filter_by(statut=StatutEmploye.ACTIF).count()
+        
+        # Compter les présents aujourd'hui (ceux qui ont badgé en entrée)
+        from datetime import datetime, date
+        today = date.today()
+        present_today = 0
+        on_site = 0
+        
+        for emp in employes:
+            # Vérifier le dernier badge de l'employé
+            last_badge = emp.badges.order_by(Badge.timestamp.desc()).first()
+            if last_badge and last_badge.timestamp.date() == today:
+                if last_badge.type_badge == TypeBadge.ENTREE:
+                    present_today += 1
+                    if last_badge.chantier_id:
+                        on_site += 1
+        
+        return render_template('employes_modern.html',
+                             employes=employes,
+                             total_employees=total_employees,
+                             active_employees=active_employees,
+                             present_today=present_today,
+                             on_site=on_site)
+    except Exception as e:
+        print(f"Erreur dans la vue employés: {e}")
+        # Fallback si pas de base de données
+        return render_template_string("""
+        {% extends "base_modern.html" %}
+        {% block title %}Employés{% endblock %}
+        {% block page_title %}Gestion des Employés{% endblock %}
+        {% block page_description %}Gérez vos équipes et ressources humaines{% endblock %}
+        {% block content %}
+        <div class="alert alert-warning">
+            <i class="ri-error-warning-line"></i> La base de données n'est pas encore configurée.
         </div>
-        <div class="card-body">
-            <p>Module de gestion des employés en cours de développement...</p>
-        </div>
-    </div>
-    {% endblock %}
-    """)
+        {% endblock %}
+        """)
 
 @modern_bp.route('/clients')
 def clients():

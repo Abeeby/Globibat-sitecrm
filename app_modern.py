@@ -28,8 +28,19 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-globibat
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///globibat.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Initialiser les extensions
-db = SQLAlchemy(app)
+# Import et initialisation de la base de données
+try:
+    # Essayer d'importer les nouveaux modèles
+    from app.models import db as models_db
+    if hasattr(models_db, 'init_app'):
+        models_db.init_app(app)
+        db = models_db
+    else:
+        db = SQLAlchemy(app)
+except (ImportError, AttributeError) as e:
+    # Fallback si models.py n'existe pas ou a des erreurs
+    db = SQLAlchemy(app)
+    print(f"ℹ️ Utilisation de SQLAlchemy par défaut: {e}")
 
 # Configurer Flask-Login si disponible
 if HAS_LOGIN:
@@ -161,13 +172,27 @@ def internal_error(error):
     """), 500
 
 # Initialisation de la base de données
-def init_db():
+def initialize_database():
+    """Initialise la base de données et charge les données de démonstration"""
     with app.app_context():
+        # Créer le dossier instance s'il n'existe pas
+        instance_path = os.path.join(os.path.dirname(__file__), 'instance')
+        if not os.path.exists(instance_path):
+            os.makedirs(instance_path)
+        
+        # Créer les tables
         db.create_all()
-        print("Base de données initialisée avec succès!")
+        print("✅ Tables de base de données créées!")
+        
+        # Charger les données de démonstration
+        try:
+            from app.models import seed_demo_data
+            seed_demo_data(app)
+        except Exception as e:
+            print(f"⚠️ Erreur lors du chargement des données de démonstration: {e}")
 
 if __name__ == '__main__':
-    init_db()
+    initialize_database()
     print("\n" + "="*50)
     print("🚀 CRM Globibat - Design Moderne")
     print("="*50)
