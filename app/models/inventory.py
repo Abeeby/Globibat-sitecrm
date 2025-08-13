@@ -35,7 +35,7 @@ class Supplier(db.Model):
     categories = db.Column(db.JSON, default=lambda: [])  # Catégories de produits
     payment_terms = db.Column(db.Integer, default=30)  # Jours
     discount_percentage = db.Column(db.Float, default=0)
-    credit_limit = db.Column(db.Decimal(10, 2))
+    credit_limit = db.Column(db.Float)
     
     # Évaluation
     rating = db.Column(db.Integer)  # 1-5 étoiles
@@ -82,8 +82,8 @@ class Material(db.Model):
     
     # Unités et prix
     unit = db.Column(db.String(20))  # m², m³, kg, pièce, etc.
-    purchase_price = db.Column(db.Decimal(10, 2))
-    selling_price = db.Column(db.Decimal(10, 2))
+    purchase_price = db.Column(db.Float)
+    selling_price = db.Column(db.Float)
     
     # Stock
     current_stock = db.Column(db.Float, default=0)
@@ -141,7 +141,7 @@ class Equipment(db.Model):
     
     # Acquisition
     purchase_date = db.Column(db.Date)
-    purchase_price = db.Column(db.Decimal(10, 2))
+    purchase_price = db.Column(db.Float)
     supplier_id = db.Column(db.Integer, db.ForeignKey('suppliers.id'))
     
     # Localisation et responsable
@@ -160,7 +160,7 @@ class Equipment(db.Model):
     
     # Amortissement
     depreciation_years = db.Column(db.Integer)
-    residual_value = db.Column(db.Decimal(10, 2))
+    residual_value = db.Column(db.Float)
     
     # Documents
     image_path = db.Column(db.String(200))
@@ -222,10 +222,10 @@ class PurchaseOrder(db.Model):
     actual_delivery = db.Column(db.Date)
     
     # Montants
-    subtotal = db.Column(db.Decimal(10, 2), default=0)
-    tax_amount = db.Column(db.Decimal(10, 2), default=0)
-    shipping_cost = db.Column(db.Decimal(10, 2), default=0)
-    total_amount = db.Column(db.Decimal(10, 2), nullable=False)
+    subtotal = db.Column(db.Float, default=0)
+    tax_amount = db.Column(db.Float, default=0)
+    shipping_cost = db.Column(db.Float, default=0)
+    total_amount = db.Column(db.Float, nullable=False)
     
     # Statut
     status = db.Column(db.String(20), default='draft')  # draft, sent, confirmed, delivered, cancelled
@@ -265,8 +265,8 @@ class PurchaseOrderItem(db.Model):
     # Quantité et prix
     quantity = db.Column(db.Float, nullable=False)
     unit = db.Column(db.String(20))
-    unit_price = db.Column(db.Decimal(10, 2), nullable=False)
-    total = db.Column(db.Decimal(10, 2), nullable=False)
+    unit_price = db.Column(db.Float, nullable=False)
+    total = db.Column(db.Float, nullable=False)
     
     # Réception
     received_quantity = db.Column(db.Float, default=0)
@@ -294,7 +294,7 @@ class EquipmentMaintenance(db.Model):
     # Détails
     description = db.Column(db.Text, nullable=False)
     performed_by = db.Column(db.String(100))
-    cost = db.Column(db.Decimal(10, 2))
+    cost = db.Column(db.Float)
     
     # Documents
     report_path = db.Column(db.String(200))

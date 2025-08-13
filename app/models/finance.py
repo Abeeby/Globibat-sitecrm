@@ -26,13 +26,13 @@ class Invoice(db.Model):
     paid_date = db.Column(db.Date)
     
     # Montants
-    subtotal = db.Column(db.Decimal(10, 2), default=0)
+    subtotal = db.Column(db.Float, default=0)
     tax_rate = db.Column(db.Float, default=7.7)  # TVA suisse standard
-    tax_amount = db.Column(db.Decimal(10, 2), default=0)
+    tax_amount = db.Column(db.Float, default=0)
     discount_percentage = db.Column(db.Float, default=0)
-    discount_amount = db.Column(db.Decimal(10, 2), default=0)
-    total_amount = db.Column(db.Decimal(10, 2), nullable=False)
-    paid_amount = db.Column(db.Decimal(10, 2), default=0)
+    discount_amount = db.Column(db.Float, default=0)
+    total_amount = db.Column(db.Float, nullable=False)
+    paid_amount = db.Column(db.Float, default=0)
     
     # Devise
     currency = db.Column(db.String(3), default='CHF')
@@ -116,8 +116,8 @@ class InvoiceItem(db.Model):
     # Quantité et prix
     quantity = db.Column(db.Float, default=1)
     unit = db.Column(db.String(20))  # Heures, m², pièces, etc.
-    unit_price = db.Column(db.Decimal(10, 2), nullable=False)
-    total = db.Column(db.Decimal(10, 2), nullable=False)
+    unit_price = db.Column(db.Float, nullable=False)
+    total = db.Column(db.Float, nullable=False)
     
     # Ordre d'affichage
     position = db.Column(db.Integer, default=0)
@@ -151,12 +151,12 @@ class Quote(db.Model):
     valid_until = db.Column(db.Date)
     
     # Montants
-    subtotal = db.Column(db.Decimal(10, 2), default=0)
+    subtotal = db.Column(db.Float, default=0)
     tax_rate = db.Column(db.Float, default=7.7)
-    tax_amount = db.Column(db.Decimal(10, 2), default=0)
+    tax_amount = db.Column(db.Float, default=0)
     discount_percentage = db.Column(db.Float, default=0)
-    discount_amount = db.Column(db.Decimal(10, 2), default=0)
-    total_amount = db.Column(db.Decimal(10, 2), nullable=False)
+    discount_amount = db.Column(db.Float, default=0)
+    total_amount = db.Column(db.Float, nullable=False)
     
     # Statut
     status = db.Column(db.String(20), default='draft')  # draft, sent, accepted, rejected, expired
@@ -229,8 +229,8 @@ class QuoteItem(db.Model):
     # Quantité et prix
     quantity = db.Column(db.Float, default=1)
     unit = db.Column(db.String(20))
-    unit_price = db.Column(db.Decimal(10, 2), nullable=False)
-    total = db.Column(db.Decimal(10, 2), nullable=False)
+    unit_price = db.Column(db.Float, nullable=False)
+    total = db.Column(db.Float, nullable=False)
     
     # Options
     is_optional = db.Column(db.Boolean, default=False)
@@ -275,9 +275,9 @@ class Expense(db.Model):
     expense_date = db.Column(db.Date, default=date.today)
     
     # Montants
-    amount = db.Column(db.Decimal(10, 2), nullable=False)
-    tax_amount = db.Column(db.Decimal(10, 2), default=0)
-    total_amount = db.Column(db.Decimal(10, 2), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    tax_amount = db.Column(db.Float, default=0)
+    total_amount = db.Column(db.Float, nullable=False)
     currency = db.Column(db.String(3), default='CHF')
     exchange_rate = db.Column(db.Float, default=1.0)  # Si devise étrangère
     
@@ -286,7 +286,7 @@ class Expense(db.Model):
     payment_status = db.Column(db.String(20), default='pending')  # pending, approved, rejected, paid, reimbursed
     paid_date = db.Column(db.Date)
     reimbursed_date = db.Column(db.Date)
-    reimbursement_amount = db.Column(db.Decimal(10, 2))
+    reimbursement_amount = db.Column(db.Float)
     
     # Documents
     receipt_path = db.Column(db.String(200))
@@ -342,7 +342,7 @@ class Payment(db.Model):
     
     # Informations de paiement
     payment_date = db.Column(db.Date, default=date.today)
-    amount = db.Column(db.Decimal(10, 2), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
     payment_method = db.Column(db.String(50))  # Virement, Carte, Espèces, Chèque
     
     # Référence bancaire

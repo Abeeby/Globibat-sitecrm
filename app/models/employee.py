@@ -1,9 +1,26 @@
 """
-Modèles pour la gestion des employés et RH
+Modèles pour la gestion des employés
 """
 from app import db
-from datetime import datetime, date
-from sqlalchemy import UniqueConstraint
+from datetime import datetime, date, timedelta
+from sqlalchemy import CheckConstraint, UniqueConstraint
+
+class Department(db.Model):
+    """Modèle pour les départements de l'entreprise"""
+    __tablename__ = 'departments'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    code = db.Column(db.String(10), unique=True, nullable=False)
+    description = db.Column(db.Text)
+    manager_id = db.Column(db.Integer, db.ForeignKey('employees.id'))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relations
+    employees = db.relationship('Employee', backref='department', lazy='dynamic', foreign_keys='Employee.department_id')
+    
+    def __repr__(self):
+        return f'<Department {self.name}>'
 
 class Employee(db.Model):
     """Modèle Employé"""
@@ -13,45 +30,44 @@ class Employee(db.Model):
     employee_code = db.Column(db.String(20), unique=True, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), unique=True)
     
+    # Département
+    department_id = db.Column(db.Integer, db.ForeignKey('departments.id'))
+    
+    # Statut et type
+    is_active = db.Column(db.Boolean, default=True)
+    employee_type = db.Column(db.String(50))  # Permanent, Temporaire, Stagiaire
+    contract_type = db.Column(db.String(50))  # CDI, CDD, Intérim
+    hire_date = db.Column(db.Date, default=date.today)
+    end_date = db.Column(db.Date)  # Pour CDD
+    
+    # Salaire et avantages
+    base_salary = db.Column(db.Float)
+    hourly_rate = db.Column(db.Float)
+    vacation_days = db.Column(db.Integer, default=25)  # Jours de congés annuels
+    remaining_vacation = db.Column(db.Float, default=25)
+    
+    # Coordonnées professionnelles
+    position = db.Column(db.String(100))
+    office_location = db.Column(db.String(100))
+    work_phone = db.Column(db.String(20))
+    work_email = db.Column(db.String(120))
+    
+    # Urgence
+    emergency_contact = db.Column(db.String(100))
+    emergency_phone = db.Column(db.String(20))
+    emergency_relationship = db.Column(db.String(50))
+    
     # Informations personnelles
     social_security = db.Column(db.String(30))
     birth_date = db.Column(db.Date)
     nationality = db.Column(db.String(50))
     marital_status = db.Column(db.String(20))
     
-    # Informations professionnelles
-    department = db.Column(db.String(50))
-    position = db.Column(db.String(100))
-    contract_type = db.Column(db.String(50))  # CDI, CDD, Intérim
-    hire_date = db.Column(db.Date, default=date.today)
-    end_date = db.Column(db.Date)  # Pour CDD
-    
-    # Salaire et avantages
-    base_salary = db.Column(db.Decimal(10, 2))
-    hourly_rate = db.Column(db.Decimal(10, 2))
-    vacation_days = db.Column(db.Integer, default=25)  # Jours de congés annuels
-    remaining_vacation = db.Column(db.Float, default=25)
-    
-    # Coordonnées professionnelles
-    work_phone = db.Column(db.String(20))
-    work_email = db.Column(db.String(120))
-    emergency_contact = db.Column(db.String(200))
-    emergency_phone = db.Column(db.String(20))
-    
-    # Adresse
-    address = db.Column(db.String(200))
-    postal_code = db.Column(db.String(10))
-    city = db.Column(db.String(100))
-    canton = db.Column(db.String(50))
-    
     # Badge et authentification
     badge_number = db.Column(db.String(20), unique=True)
     qr_code = db.Column(db.String(100), unique=True)
     pin_code = db.Column(db.String(6))  # Code PIN à 6 chiffres
     face_data = db.Column(db.JSON)  # Données biométriques (future feature)
-    
-    # Statut
-    is_active = db.Column(db.Boolean, default=True)
     
     # Relations
     attendances = db.relationship('Attendance', backref='employee', lazy='dynamic')
@@ -216,21 +232,21 @@ class Payroll(db.Model):
     overtime_hours = db.Column(db.Float, default=0)
     
     # Salaire brut
-    base_amount = db.Column(db.Decimal(10, 2))
-    overtime_amount = db.Column(db.Decimal(10, 2))
-    bonuses = db.Column(db.Decimal(10, 2), default=0)
-    gross_salary = db.Column(db.Decimal(10, 2))
+    base_amount = db.Column(db.Float)
+    overtime_amount = db.Column(db.Float)
+    bonuses = db.Column(db.Float, default=0)
+    gross_salary = db.Column(db.Float)
     
     # Déductions
-    social_security = db.Column(db.Decimal(10, 2))  # AVS/AI/APG
-    unemployment = db.Column(db.Decimal(10, 2))     # AC
-    pension = db.Column(db.Decimal(10, 2))          # LPP
-    accident_insurance = db.Column(db.Decimal(10, 2))  # LAA
-    tax_deduction = db.Column(db.Decimal(10, 2))   # Impôt à la source
-    other_deductions = db.Column(db.Decimal(10, 2), default=0)
+    social_security = db.Column(db.Float)  # AVS/AI/APG
+    unemployment = db.Column(db.Float)     # AC
+    pension = db.Column(db.Float)          # LPP
+    accident_insurance = db.Column(db.Float)  # LAA
+    tax_deduction = db.Column(db.Float)   # Impôt à la source
+    other_deductions = db.Column(db.Float, default=0)
     
     # Salaire net
-    net_salary = db.Column(db.Decimal(10, 2))
+    net_salary = db.Column(db.Float)
     
     # Paiement
     payment_date = db.Column(db.Date)

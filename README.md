@@ -1,159 +1,270 @@
-# Globibat CRM - Système de Gestion d'Entreprise de Construction
+# 🏗️ Globibat CRM - Système de Gestion Intégré
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.8+-green.svg)](https://www.python.org/)
-[![Flask](https://img.shields.io/badge/flask-2.0+-red.svg)](https://flask.palletsprojects.com/)
+## 📋 Description
 
-## 🏗️ Description
+**Globibat CRM** est une solution complète de gestion d'entreprise pour le secteur de la construction et de la rénovation. Le système intègre plusieurs modules essentiels :
 
-**Globibat CRM** est un système de gestion complet pour entreprises de construction, développé spécifiquement pour le marché Suisse romande. Cette solution tout-en-un intègre :
+- 🌐 **Site Internet Public** - Vitrine de l'entreprise
+- 💼 **CRM Complet** - Gestion clients, projets et devis
+- 👤 **Espace Employé** - Portail personnel pour chaque employé
+- 🎫 **Système de Badge** - Pointage et suivi des présences
+- 📊 **Tableaux de Bord** - Analytics et rapports en temps réel
+- 💰 **Gestion Financière** - Factures, paiements et comptabilité
+- 📱 **API REST** - Intégration avec d'autres systèmes
 
-- 🏢 **CRM Complet** : Gestion clients, projets, devis, factures
-- 👷 **Gestion RH** : Système de badge, paie, congés
-- 💰 **Module Finance** : Comptabilité, paiements, dépenses
-- 📊 **Tableaux de Bord** : Statistiques et rapports en temps réel
-- 🔒 **Sécurité** : Authentification 2FA, rôles et permissions
-- 📱 **API REST** : Pour intégration mobile et externes
+## 🚀 Installation Rapide
 
-## 🚀 Fonctionnalités Principales
+### Prérequis
 
-### Module CRM
-- Gestion complète des clients et contacts
-- Suivi des projets de construction avec phases et tâches
-- Création et suivi des devis
-- Facturation automatisée avec numérotation
-- Génération PDF (devis, factures)
+- Python 3.8 ou supérieur
+- pip (gestionnaire de paquets Python)
+- Git (optionnel)
 
-### Module RH
-- Système de badge 4 points (arrivée matin/après-midi, départ matin/après-midi)
-- Gestion des employés et équipes
-- Suivi des congés et absences
-- Génération automatique des fiches de paie
-- Calcul des charges sociales suisses
+### Windows
 
-### Module Finance
-- Suivi des paiements clients
-- Gestion des dépenses
-- Rapports financiers
-- Export Excel
-
-### Module Inventaire
-- Gestion des matériaux
-- Suivi des équipements
-- Gestion des fournisseurs
-- Bons de commande
-
-## 📋 Prérequis
-
-- Python 3.8+
-- MySQL 5.7+ ou PostgreSQL 12+
-- Redis (optionnel, pour Celery)
-
-## 🛠️ Installation
-
-### 1. Cloner le repository
-
+1. **Cloner le projet** (ou télécharger le ZIP)
 ```bash
-git clone https://github.com/Abeeby/Globibat-sitecrm.git
-cd Globibat-sitecrm
+git clone https://github.com/votre-repo/globibat-crm.git
+cd globibat-crm
 ```
 
-### 2. Créer l'environnement virtuel
-
+2. **Lancer l'application**
 ```bash
-python -m venv venv
+LANCER_CRM_LOCAL.bat
+```
+
+Le script s'occupe automatiquement de :
+- Créer l'environnement virtuel Python
+- Installer toutes les dépendances
+- Initialiser la base de données
+- Lancer le serveur
+
+### Linux/Mac
+
+1. **Cloner le projet**
+```bash
+git clone https://github.com/votre-repo/globibat-crm.git
+cd globibat-crm
+```
+
+2. **Créer l'environnement virtuel**
+```bash
+python3 -m venv venv
 source venv/bin/activate  # Linux/Mac
-# ou
-.\venv\Scripts\activate  # Windows
 ```
 
-### 3. Installer les dépendances
-
+3. **Installer les dépendances**
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Configuration
+4. **Configurer l'environnement**
+```bash
+cp .env.example .env
+# Éditer .env avec vos paramètres
+```
 
-Créer un fichier `.env` à la racine :
+5. **Initialiser la base de données**
+```bash
+python init_database.py
+```
+
+6. **Lancer l'application**
+```bash
+python app.py
+```
+
+## 🔐 Accès au Système
+
+### Points d'Accès
+
+| Module | URL | Description |
+|--------|-----|-------------|
+| Site Public | http://localhost:5000 | Page d'accueil publique |
+| Admin CRM | http://localhost:5000/admin | Panneau d'administration |
+| Espace Employé | http://localhost:5000/employee | Portail employé |
+| Système Badge | http://localhost:5000/badge | Interface de pointage |
+| API REST | http://localhost:5000/api/v1/ | Documentation API |
+
+### Comptes de Test
+
+**Administrateur CRM**
+- Email : `info@globibat.com`
+- Mot de passe : (défini dans init_database.py)
+
+**Employés de Test**
+- Matricules : `EMP001` à `EMP005`
+- Mot de passe : `Employee2024!`
+
+## 📁 Structure du Projet
+
+```
+globibat-crm/
+│
+├── app/                    # Application principale
+│   ├── __init__.py        # Initialisation Flask
+│   ├── models/            # Modèles de données
+│   │   ├── user.py       # Gestion utilisateurs
+│   │   ├── employee.py   # Gestion employés
+│   │   ├── client.py     # Gestion clients
+│   │   ├── project.py    # Gestion projets
+│   │   └── ...
+│   ├── views/             # Vues et routes
+│   │   ├── auth.py       # Authentification
+│   │   ├── crm.py        # Routes CRM
+│   │   ├── badge.py      # Système de badge
+│   │   └── ...
+│   ├── templates/         # Templates HTML
+│   ├── static/           # Fichiers statiques
+│   └── utils/            # Utilitaires
+│
+├── instance/             # Données d'instance
+│   └── globibat.db      # Base de données SQLite
+│
+├── logs/                 # Fichiers de logs
+├── venv/                 # Environnement virtuel
+│
+├── app.py               # Point d'entrée
+├── config.py            # Configuration
+├── init_database.py     # Initialisation DB
+├── requirements.txt     # Dépendances Python
+├── .env                 # Variables d'environnement (non versionné)
+├── .env.example         # Exemple de configuration
+├── .gitignore          # Fichiers ignorés par Git
+└── README.md           # Ce fichier
+```
+
+## 🛠️ Fonctionnalités Principales
+
+### CRM
+- ✅ Gestion complète des clients
+- ✅ Suivi des projets et chantiers
+- ✅ Création de devis et factures
+- ✅ Gestion des stocks et matériaux
+- ✅ Planning et calendrier
+
+### Système de Badge
+- ✅ Pointage par matricule
+- ✅ 4 moments de badge par jour
+- ✅ Calcul automatique des heures
+- ✅ Détection des retards
+- ✅ Notifications automatiques
+
+### Espace Employé
+- ✅ Consultation des pointages
+- ✅ Demandes de congés
+- ✅ Notes de frais
+- ✅ Documents personnels
+- ✅ Fiches de paie
+
+### Rapports et Analytics
+- ✅ Tableaux de bord temps réel
+- ✅ Rapports Excel exportables
+- ✅ Graphiques interactifs
+- ✅ Statistiques de présence
+- ✅ Analyse de rentabilité
+
+## 🔧 Configuration
+
+### Variables d'Environnement
+
+Copier `.env.example` vers `.env` et configurer :
 
 ```env
-SECRET_KEY=votre-cle-secrete
-DATABASE_URL=mysql://user:pass@localhost/globibat_crm
-MAIL_SERVER=smtp.example.com
-MAIL_USERNAME=your-email@example.com
-MAIL_PASSWORD=your-password
+# Flask
+FLASK_ENV=development
+FLASK_DEBUG=False
+
+# Sécurité
+SECRET_KEY=votre-clé-secrète
+
+# Base de données
+DATABASE_URL=sqlite:///instance/globibat.db
+
+# Email (pour les notifications)
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=votre-email@gmail.com
+MAIL_PASSWORD=votre-mot-de-passe
 ```
 
-### 5. Initialiser la base de données
+### Configuration Email
+
+Pour activer les notifications par email :
+
+1. Activer l'accès aux applications moins sécurisées (Gmail)
+2. Ou utiliser un mot de passe d'application
+3. Configurer les variables MAIL_* dans .env
+
+## 📊 API REST
+
+L'API REST permet l'intégration avec d'autres systèmes :
+
+### Endpoints Principaux
+
+- `GET /api/v1/employees` - Liste des employés
+- `GET /api/v1/attendance` - Données de présence
+- `POST /api/v1/badge` - Enregistrer un pointage
+- `GET /api/v1/projects` - Liste des projets
+- `GET /api/v1/clients` - Liste des clients
+
+### Authentification
+
+L'API utilise des tokens JWT pour l'authentification :
 
 ```bash
-python run.py init_db
-python run.py create_admin
+curl -X POST http://localhost:5000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"info@globibat.com","password":"***"}'
 ```
 
-### 6. Lancer l'application
+## 🚀 Déploiement
 
-```bash
-python run.py
-```
+### Production
 
-L'application sera accessible sur http://localhost:5000
+Pour déployer en production :
 
-## 🌐 Déploiement
-
-### Hostinger VPS
-
-Consultez le guide complet : [DEPLOIEMENT_VPS_HOSTINGER.md](DEPLOIEMENT_VPS_HOSTINGER.md)
+1. Configurer les variables d'environnement de production
+2. Utiliser une base de données PostgreSQL ou MySQL
+3. Configurer un serveur web (Nginx/Apache)
+4. Utiliser Gunicorn ou uWSGI comme serveur WSGI
+5. Activer HTTPS avec certificat SSL
 
 ### Docker
 
+Un Dockerfile est disponible pour containeriser l'application :
+
 ```bash
 docker build -t globibat-crm .
-docker run -p 5000:5000 --env-file .env globibat-crm
+docker run -p 5000:5000 globibat-crm
 ```
 
-## 📱 API Documentation
+## 🤝 Contribution
 
-L'API REST est disponible sur `/api/v1/`. Documentation complète :
-
-- `GET /api/v1/projects` - Liste des projets
-- `POST /api/v1/clients` - Créer un client
-- `GET /api/v1/dashboard/stats` - Statistiques
-
-## 🧪 Tests
-
-```bash
-pytest tests/
-```
-
-## 📄 License
-
-Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
-
-## 👥 Contribution
-
-Les contributions sont les bienvenues ! Merci de :
+Les contributions sont les bienvenues ! Pour contribuer :
 
 1. Fork le projet
 2. Créer une branche (`git checkout -b feature/AmazingFeature`)
-3. Commit vos changements (`git commit -m 'Add AmazingFeature'`)
-4. Push sur la branche (`git push origin feature/AmazingFeature`)
+3. Commit les changements (`git commit -m 'Add AmazingFeature'`)
+4. Push vers la branche (`git push origin feature/AmazingFeature`)
 5. Ouvrir une Pull Request
+
+## 📝 Licence
+
+Ce projet est sous licence propriétaire. Tous droits réservés à Globibat SA.
 
 ## 📞 Support
 
-- 📧 Email : info@globibat.com
-- 📱 Tél : +41 21 505 00 62
-- 🌐 Site : https://www.globibat.com
+Pour toute question ou assistance :
 
-## 🏆 SEO & Performance
+- 📧 Email : support@globibat.ch
+- 📱 Téléphone : +41 79 123 45 67
+- 🌐 Site : https://www.globibat.ch
 
-- Page d'accueil optimisée pour "entreprise construction Genève"
-- Score PageSpeed : 95+
-- Mobile-friendly
-- Schema.org intégré
+## 🏆 Équipe
+
+Développé avec ❤️ par l'équipe Globibat
 
 ---
 
-**Développé avec ❤️ pour Globibat SA - Leader de la construction en Suisse romande**
+© 2024 Globibat SA - Tous droits réservés

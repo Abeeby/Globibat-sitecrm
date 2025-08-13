@@ -14,14 +14,14 @@ class ExpensePolicy(db.Model):
     category = db.Column(db.String(50), nullable=False)
     
     # Limites
-    daily_limit = db.Column(db.Decimal(10, 2))
-    monthly_limit = db.Column(db.Decimal(10, 2))
-    per_expense_limit = db.Column(db.Decimal(10, 2))
+    daily_limit = db.Column(db.Float)
+    monthly_limit = db.Column(db.Float)
+    per_expense_limit = db.Column(db.Float)
     
     # Règles
     requires_receipt = db.Column(db.Boolean, default=True)
     requires_approval = db.Column(db.Boolean, default=True)
-    approval_threshold = db.Column(db.Decimal(10, 2))  # Montant nécessitant approbation
+    approval_threshold = db.Column(db.Float)  # Montant nécessitant approbation
     
     # Employés concernés
     applies_to_all = db.Column(db.Boolean, default=True)
@@ -99,7 +99,7 @@ class EmployeeStatistics(db.Model):
     sick_days = db.Column(db.Float, default=0)
     
     # Dépenses
-    total_expenses = db.Column(db.Decimal(10, 2), default=0)
+    total_expenses = db.Column(db.Float, default=0)
     expenses_by_category = db.Column(db.JSON)  # {"Transport": 150.50, "Repas": 75.00}
     
     # Performance
@@ -134,8 +134,8 @@ class CompanyDashboard(db.Model):
     overtime_hours_today = db.Column(db.Float, default=0)
     
     # Coûts
-    labor_cost_today = db.Column(db.Decimal(10, 2), default=0)
-    expense_cost_today = db.Column(db.Decimal(10, 2), default=0)
+    labor_cost_today = db.Column(db.Float, default=0)
+    expense_cost_today = db.Column(db.Float, default=0)
     
     # Projets
     active_projects = db.Column(db.Integer, default=0)

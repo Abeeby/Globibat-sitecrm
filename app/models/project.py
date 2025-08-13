@@ -36,9 +36,9 @@ class Project(db.Model):
     actual_end_date = db.Column(db.Date)
     
     # Budget et finances
-    estimated_budget = db.Column(db.Decimal(12, 2))
-    approved_budget = db.Column(db.Decimal(12, 2))
-    current_cost = db.Column(db.Decimal(12, 2), default=0)
+    estimated_budget = db.Column(db.Float)
+    approved_budget = db.Column(db.Float)
+    current_cost = db.Column(db.Float, default=0)
     margin_percentage = db.Column(db.Float)
     
     # Statut et progression
@@ -119,8 +119,8 @@ class ProjectPhase(db.Model):
     actual_end = db.Column(db.Date)
     
     # Budget
-    estimated_cost = db.Column(db.Decimal(10, 2))
-    actual_cost = db.Column(db.Decimal(10, 2), default=0)
+    estimated_cost = db.Column(db.Float)
+    actual_cost = db.Column(db.Float, default=0)
     
     # Statut
     status = db.Column(db.String(20), default='pending')  # pending, in_progress, completed, cancelled

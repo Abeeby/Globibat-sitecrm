@@ -1,3 +1,3 @@
 """
-Utilitaires pour l'application
+Utilitaires de l'application
 """
