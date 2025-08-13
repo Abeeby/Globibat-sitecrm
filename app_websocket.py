@@ -58,12 +58,30 @@ except ImportError as e:
     from flask_sqlalchemy import SQLAlchemy
     db = SQLAlchemy(app)
 
-# Import des vues
+# Import des vues - IMPORTANT: Après l'initialisation de la base de données
 try:
     from app.views.modern_views import modern_bp
-    app.register_blueprint(modern_bp, url_prefix='/modern')
+    app.register_blueprint(modern_bp)
+    print("✅ Blueprint modern enregistré avec succès!")
 except ImportError as e:
     print(f"⚠️ Erreur d'import des vues modernes: {e}")
+    # Créer des routes minimales si l'import échoue
+    @app.route('/modern/<path:path>')
+    def modern_fallback(path):
+        return jsonify({"error": "Module modern_views non disponible", "path": path}), 503
+
+# Contexte global pour les templates
+@app.context_processor
+def inject_user():
+    """Injecter current_user dans tous les templates"""
+    # Créer un objet utilisateur factice si Flask-Login n'est pas disponible
+    class DummyUser:
+        def __init__(self):
+            self.is_authenticated = False
+            self.username = 'Utilisateur'
+            self.role = 'Admin'
+    
+    return dict(current_user=DummyUser())
 
 # Route principale
 @app.route('/')

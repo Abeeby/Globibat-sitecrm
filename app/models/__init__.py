@@ -710,3 +710,34 @@ def seed_demo_data(app):
         db.session.commit()
         print("✅ Données de démonstration créées avec succès!")
         return True
+
+# Exporter tous les modèles pour faciliter les imports
+__all__ = [
+    'db',
+    'init_db',
+    'seed_demo_data',
+    'User',
+    'Employe',
+    'Client',
+    'Chantier',
+    'Devis',
+    'Facture',
+    'LigneFacture',
+    'Badge',
+    'Lead',
+    'Materiel',
+    'MaintenanceMateriel',
+    'Consommable',
+    'IncidentSecurite',
+    'FichePaie',
+    'PhotoChantier',
+    'DocumentChantier',
+    'RelanceFacture',
+    'Message',
+    'Parametre',
+    'StatutEmploye',
+    'StatutChantier',
+    'StatutFacture',
+    'TypeBadge',
+    'PrioriteAnomalie'
+]

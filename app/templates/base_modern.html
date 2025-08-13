@@ -52,7 +52,7 @@
             </div>
             
             <div class="header-right">
-                {% if current_user.is_authenticated %}
+                {% if current_user and current_user.is_authenticated %}
                 <!-- Notifications -->
                 <button class="header-btn has-badge" id="notificationBtn">
                     <i class="ri-notification-3-line"></i>
@@ -85,8 +85,8 @@
                                     <i class="ri-user-3-fill"></i>
                                 </div>
                                 <div class="ms-3">
-                                    <h6 class="mb-0">{{ current_user.username|default('Utilisateur') }}</h6>
-                                    <small class="text-muted">{{ current_user.role|default('Admin') }}</small>
+                                    <h6 class="mb-0">{{ current_user.username if (current_user and current_user.is_authenticated) else 'Utilisateur' }}</h6>
+                                    <small class="text-muted">{{ current_user.role if (current_user and current_user.is_authenticated) else 'Admin' }}</small>
                                 </div>
                             </div>
                         </div>
@@ -112,7 +112,7 @@
             </div>
         </header>
         
-        {% if current_user.is_authenticated %}
+        {% if current_user and current_user.is_authenticated %}
         <!-- Sidebar -->
         <aside class="app-sidebar" id="sidebar">
             <nav class="sidebar-nav">

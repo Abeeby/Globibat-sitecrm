@@ -4,7 +4,7 @@ Blueprint pour l'authentification
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db
-from app.models import User, Role
+from app.models import User  # Role removed as it doesn't exist
 from app.forms.auth import LoginForm, RegisterForm, TwoFactorForm
 import qrcode
 import io
