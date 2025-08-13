@@ -16,7 +16,6 @@ import ClientsScreen from './src/screens/ClientsScreen';
 import BadgesScreen from './src/screens/BadgesScreen';
 import ChatsScreen from './src/screens/ChatsScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
-import QRScannerScreen from './src/screens/QRScannerScreen';
 import NotificationsScreen from './src/screens/NotificationsScreen';
 
 // Import des contextes et services
@@ -59,7 +58,7 @@ function MainTabs() {
           } else if (route.name === 'Clients') {
             iconName = 'domain';
           } else if (route.name === 'Badges') {
-            iconName = 'qrcode-scan';
+            iconName = 'badge-account';
           } else if (route.name === 'Chat') {
             iconName = 'message-text';
           } else if (route.name === 'Profil') {
@@ -135,18 +134,6 @@ function RootNavigator() {
       {user ? (
         <>
           <Stack.Screen name="Main" component={MainTabs} />
-          <Stack.Screen 
-            name="QRScanner" 
-            component={QRScannerScreen}
-            options={{
-              headerShown: true,
-              headerTitle: 'Scanner QR',
-              headerStyle: {
-                backgroundColor: theme.colors.primary,
-              },
-              headerTintColor: '#fff',
-            }}
-          />
           <Stack.Screen 
             name="Notifications" 
             component={NotificationsScreen}
